@@ -1,10 +1,12 @@
 import React from 'react';
 import {SafeAreaView, Text} from 'react-native';
 
+import Scanner from './src/components/scanner/Scanner';
+
 function App() {
   return (
-    <SafeAreaView>
-      <Text>Hello F</Text>
+    <SafeAreaView style={{flex: 1}}>
+      <Scanner />
     </SafeAreaView>
   );
 }
