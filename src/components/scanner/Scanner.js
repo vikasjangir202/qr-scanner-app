@@ -69,12 +69,7 @@ class Scanner extends Component {
             buttonPositive: 'Ok',
             buttonNegative: 'Cancel',
           }}
-          androidRecordAudioPermissionOptions={{
-            title: 'Permission to use audio recording',
-            message: 'We need your permission to use your audio',
-            buttonPositive: 'Ok',
-            buttonNegative: 'Cancel',
-          }}
+          captureAudio={false}
           style={styles.preview}
           type={this.state.camera.type}
         />
