@@ -1,7 +1,10 @@
 import React, {Component} from 'react';
-import {Button, Text, View} from 'react-native';
+import {Button, Text, TouchableOpacity, View} from 'react-native';
 import {RNCamera} from 'react-native-camera';
-
+import BarcodeMask from 'react-native-barcode-mask';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {colors} from '../../Configs/Colors';
+import BottomNav from '../BottomNav/BottomNav';
 class Scanner extends Component {
   constructor(props) {
     super(props);
@@ -11,8 +14,9 @@ class Scanner extends Component {
     this.state = {
       camera: {
         type: RNCamera.Constants.Type.back,
-        flashMode: RNCamera.Constants.FlashMode.auto,
+        flashMode: RNCamera.Constants.FlashMode.off,
       },
+      zoom: 0,
     };
   }
 
@@ -26,14 +30,6 @@ class Scanner extends Component {
       }
     }
     return;
-  }
-
-  async takePicture() {
-    if (this.camera) {
-      const options = {quality: 0.5, base64: true};
-      const data = await this.camera.takePictureAsync(options);
-      console.log(data.uri);
-    }
   }
 
   pendingView() {
@@ -57,12 +53,8 @@ class Scanner extends Component {
           ref={ref => {
             this.camera = ref;
           }}
-          defaultTouchToFocus
           flashMode={this.state.camera.flashMode}
-          mirrorImage={false}
           onBarCodeRead={this.onBarCodeRead.bind(this)}
-          onFocusChanged={() => {}}
-          onZoomChanged={() => {}}
           androidCameraPermissionOptions={{
             title: 'Permission to use camera',
             message: 'We need your permission to use your camera',
@@ -72,19 +64,81 @@ class Scanner extends Component {
           captureAudio={false}
           style={styles.preview}
           type={this.state.camera.type}
-        />
-        <View style={[styles.overlay, styles.topOverlay]}>
-          <Text style={styles.scanScreenMessage}>Please scan the barcode.</Text>
-        </View>
-        <View style={[styles.overlay, styles.bottomOverlay]}>
-          <Button
-            onPress={() => {
-              console.log('scan clicked');
-            }}
-            style={styles.enterBarcodeManualButton}
-            title="Enter Barcode"
+          zoom={this.state.zoom}>
+          <BarcodeMask
+            edgeColor={colors.yellow}
+            showAnimatedLine={true}
+            animatedLineColor={colors.yellow}
+            lineAnimationDuration={2000}
+            width={300}
+            height={300}
+            outerMaskOpacity={0.7}
+            edgeRadius={5}
           />
+        </RNCamera>
+        <View style={[styles.overlay, styles.topOverlay]}>
+          <Text style={styles.scanScreenMessage}>
+            Align the QR code within the frame to scan
+          </Text>
         </View>
+        <View style={[styles.overlay, styles.topOverlayButtons]}>
+          <TouchableOpacity
+            onPress={() => {
+              this.setState({
+                camera: {
+                  flashMode:
+                    this.state.camera.flashMode === 0
+                      ? RNCamera.Constants.FlashMode.torch
+                      : RNCamera.Constants.FlashMode.off,
+                  type: this.state.camera.type,
+                },
+              });
+            }}>
+            <Text>
+              <MaterialIcons
+                name={
+                  this.state.camera.flashMode !== 0 ? 'flash-on' : 'flash-off'
+                }
+                size={25}
+                color={
+                  this.state.camera.flashMode !== 0
+                    ? colors.yellow
+                    : colors.white
+                }
+              />
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity>
+            <Text>
+              <MaterialIcons name="image" size={25} color="white" />
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => {
+              this.setState({
+                camera: {
+                  type:
+                    this.state.camera.type === 0
+                      ? RNCamera.Constants.Type.front
+                      : RNCamera.Constants.Type.back,
+                  flashMode: this.state.camera.flashMode,
+                },
+              });
+            }}>
+            <Text>
+              <MaterialIcons
+                name="flip-camera-android"
+                size={25}
+                color={
+                  this.state.camera.type !== 0 ? colors.yellow : colors.white
+                }
+              />
+            </Text>
+          </TouchableOpacity>
+        </View>
+        <BottomNav />
       </View>
     );
   }
@@ -101,17 +155,33 @@ const styles = {
   },
   overlay: {
     position: 'absolute',
-    padding: 16,
+    padding: 12,
     right: 0,
     left: 0,
     alignItems: 'center',
   },
   topOverlay: {
-    top: 0,
+    top: 150,
     flex: 1,
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
+    display: 'flex',
+    width: '100%',
+  },
+
+  topOverlayButtons: {
+    top: 15,
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    display: 'flex',
+    // width: '100%',
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    marginHorizontal: 20,
+    borderRadius: 10,
+    marginTop: 20,
   },
   bottomOverlay: {
     bottom: 0,
@@ -121,11 +191,11 @@ const styles = {
     alignItems: 'center',
   },
   enterBarcodeManualButton: {
-    padding: 15,
     backgroundColor: 'white',
     borderRadius: 40,
   },
   scanScreenMessage: {
+    width: '45%',
     fontSize: 14,
     color: 'white',
     textAlign: 'center',
