@@ -49,7 +49,7 @@ class Scanner extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <RNCamera
+        {/* <RNCamera
           ref={ref => {
             this.camera = ref;
           }}
@@ -75,7 +75,7 @@ class Scanner extends Component {
             outerMaskOpacity={0.7}
             edgeRadius={5}
           />
-        </RNCamera>
+        </RNCamera> */}
         <View style={[styles.overlay, styles.topOverlay]}>
           <Text style={styles.scanScreenMessage}>
             Align the QR code within the frame to scan
