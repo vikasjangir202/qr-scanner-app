@@ -138,7 +138,7 @@ class Scanner extends Component {
             </Text>
           </TouchableOpacity>
         </View>
-        <BottomNav />
+        <BottomNav navigation={this.props.navigation} routeName="" />
       </View>
     );
   }

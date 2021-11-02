@@ -5,17 +5,35 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {colors} from '../../Configs/Colors';
 
-export default function BottomNav() {
+export default function BottomNav({navigation, routeName}) {
   return (
     <View style={styles.overlay}>
       <View style={styles.bottomOverlay}>
-        <TouchableOpacity style={styles.navButtons}>
-          <Octicons name="history" size={25} color={colors.lightGray} />
-          <Text style={styles.navLabel}>History</Text>
+        <TouchableOpacity
+          style={styles.navButtons}
+          onPress={() => navigation.navigate('History')}>
+          <Octicons
+            name="history"
+            size={25}
+            color={routeName === 'history' ? colors.yellow : colors.lightGray}
+          />
+
+          <Text
+            style={[
+              styles.navLabel,
+              {
+                color:
+                  routeName === 'history' ? colors.yellow : colors.lightGray,
+              },
+            ]}>
+            History
+          </Text>
         </TouchableOpacity>
 
         <View style={styles.middleButton}>
-          <TouchableOpacity style={styles.navButtons}>
+          <TouchableOpacity
+            style={styles.navButtons}
+            onPress={() => navigation.navigate('Home')}>
             <MaterialIcons
               name="qr-code-scanner"
               size={30}
@@ -25,13 +43,24 @@ export default function BottomNav() {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={styles.navButtons}>
+        <TouchableOpacity
+          style={styles.navButtons}
+          onPress={() => navigation.navigate('Generate')}>
           <MaterialCommunityIcons
             name="view-grid-plus-outline"
             size={25}
-            color={colors.lightGray}
+            color={routeName === 'generate' ? colors.yellow : colors.lightGray}
           />
-          <Text style={styles.navLabel}>Generate</Text>
+          <Text
+            style={[
+              styles.navLabel,
+              {
+                color:
+                  routeName === 'generate' ? colors.yellow : colors.lightGray,
+              },
+            ]}>
+            Generate
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
