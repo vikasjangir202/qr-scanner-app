@@ -5,6 +5,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import HomeScreen from './src/Screens/HomeScreen/HomeScreen';
 import HistoryScreen from './src/Screens/HistoryScreen/HistoryScreen';
 import GenerateScreen from './src/Screens/GenerateScreen/GenerateScreen';
+import ScannedResult from './src/components/ScannedResult/ScannedResult';
 
 const Stack = createNativeStackNavigator();
 
@@ -20,6 +21,7 @@ function App() {
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="History" component={HistoryScreen} />
           <Stack.Screen name="Generate" component={GenerateScreen} />
+          <Stack.Screen name="ScannedResult" component={ScannedResult} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaView>

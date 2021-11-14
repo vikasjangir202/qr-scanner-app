@@ -1,10 +1,11 @@
 import React, {Component} from 'react';
-import {Button, Text, TouchableOpacity, View} from 'react-native';
+import {Text, TouchableOpacity, View} from 'react-native';
 import {RNCamera} from 'react-native-camera';
 import BarcodeMask from 'react-native-barcode-mask';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {colors} from '../../Configs/Colors';
 import BottomNav from '../BottomNav/BottomNav';
+import ScannedResult from '../ScannedResult/ScannedResult';
 class Scanner extends Component {
   constructor(props) {
     super(props);
@@ -21,13 +22,11 @@ class Scanner extends Component {
   }
 
   onBarCodeRead(scanResult) {
-    console.warn(scanResult.type);
-    console.warn(scanResult.data);
     if (scanResult.data != null) {
-      if (!this.barcodeCodes.includes(scanResult.data)) {
-        this.barcodeCodes.push(scanResult.data);
-        console.warn('onBarCodeRead call');
-      }
+      this.props.navigation.navigate('ScannedResult', {
+        data: scanResult.data,
+        type: scanResult.type,
+      });
     }
     return;
   }
@@ -49,7 +48,7 @@ class Scanner extends Component {
   render() {
     return (
       <View style={styles.container}>
-        {/* <RNCamera
+        <RNCamera
           ref={ref => {
             this.camera = ref;
           }}
@@ -75,7 +74,7 @@ class Scanner extends Component {
             outerMaskOpacity={0.7}
             edgeRadius={5}
           />
-        </RNCamera> */}
+        </RNCamera>
         <View style={[styles.overlay, styles.topOverlay]}>
           <Text style={styles.scanScreenMessage}>
             Align the QR code within the frame to scan
