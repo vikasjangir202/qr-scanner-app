@@ -5,7 +5,6 @@ import BarcodeMask from 'react-native-barcode-mask';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {colors} from '../../Configs/Colors';
 import BottomNav from '../BottomNav/BottomNav';
-import ScannedResult from '../ScannedResult/ScannedResult';
 class Scanner extends Component {
   constructor(props) {
     super(props);
@@ -33,13 +32,7 @@ class Scanner extends Component {
 
   pendingView() {
     return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: 'lightgreen',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
+      <View style={styles.waiting}>
         <Text>Waiting</Text>
       </View>
     );
@@ -200,6 +193,12 @@ const styles = {
     textAlign: 'center',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  waiting: {
+    flex: 1,
+    backgroundColor: 'lightgreen',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 };
 

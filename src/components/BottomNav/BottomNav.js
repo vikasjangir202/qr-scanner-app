@@ -82,8 +82,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'center',
     width: '100%',
-    padding: 10,
-    borderRadius: 10,
+    padding: 7,
+    borderRadius: 7,
   },
   navLabel: {
     color: colors.lightGray,
@@ -101,9 +101,7 @@ const styles = StyleSheet.create({
     borderColor: colors.darkGray,
   },
   middleButton: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
     bottom: 30,
+    marginLeft: 10,
   },
 });
