@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
     borderColor: colors.darkGray,
   },
   middleButton: {
-    bottom: 30,
+    bottom: 37,
     marginLeft: 10,
   },
 });

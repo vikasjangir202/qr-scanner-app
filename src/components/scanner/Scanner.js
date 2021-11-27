@@ -3,8 +3,11 @@ import {Text, TouchableOpacity, View} from 'react-native';
 import {RNCamera} from 'react-native-camera';
 import BarcodeMask from 'react-native-barcode-mask';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import * as ImagePicker from 'react-native-image-picker';
+import RNQRGenerator from 'rn-qr-generator';
 import {colors} from '../../Configs/Colors';
 import BottomNav from '../BottomNav/BottomNav';
+
 class Scanner extends Component {
   constructor(props) {
     super(props);
@@ -17,6 +20,10 @@ class Scanner extends Component {
         flashMode: RNCamera.Constants.FlashMode.off,
       },
       zoom: 0,
+      reader: {
+        message: null,
+        data: null,
+      },
     };
   }
 
@@ -38,10 +45,54 @@ class Scanner extends Component {
     );
   }
 
+  openPicker() {
+    console.log('ImagePicker');
+    ImagePicker.showImagePicker(
+      {
+        title: 'Select Image',
+        mediaType: 'photo',
+        takePhotoButtonTitle: '',
+        selectionLimit: 1,
+        includeBase64: true,
+      },
+      response => {
+        // console.log('Response = ', response);
+
+        if (response.didCancel) {
+          console.log('User cancelled image picker');
+        } else if (response.error) {
+          console.log('ImagePicker Error: ', response.error);
+        } else if (response.customButton) {
+          console.log('User tapped custom button: ', response.customButton);
+        } else {
+          if (response.uri) {
+            console.log(response);
+            RNQRGenerator.detect({
+              uri: response.path,
+              base64: response.uri,
+            })
+              .then(response => {
+                const {values} = response; // Array of detected QR code values. Empty if nothing found.
+                if (values[0]) {
+                  this.props.navigation.navigate('ScannedResult', {
+                    data: values[0],
+                    type: 'QRCODE',
+                  });
+                } else {
+                  alert('QrCode not found in given image');
+                }
+              })
+              .catch(error => alert('QrCode not found in given image'));
+          }
+        }
+      },
+    );
+  }
+
   render() {
     return (
       <View style={styles.container}>
-        <RNCamera
+        {/* <RNCamera
           ref={ref => {
             this.camera = ref;
           }}
@@ -67,7 +118,7 @@ class Scanner extends Component {
             outerMaskOpacity={0.7}
             edgeRadius={5}
           />
-        </RNCamera>
+        </RNCamera> */}
         <View style={[styles.overlay, styles.topOverlay]}>
           <Text style={styles.scanScreenMessage}>
             Align the QR code within the frame to scan
@@ -101,7 +152,7 @@ class Scanner extends Component {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => this.openPicker()}>
             <Text>
               <MaterialIcons name="image" size={25} color="white" />
             </Text>
