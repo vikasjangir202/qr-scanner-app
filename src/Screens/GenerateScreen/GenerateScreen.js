@@ -3,44 +3,58 @@ import {
   View,
   Text,
   StyleSheet,
-  Dimensions,
-  FlatList,
   TouchableOpacity,
+  TextInput,
+  ScrollView,
 } from 'react-native';
 import BottomNav from '../../components/BottomNav/BottomNav';
 import {colors} from '../../Configs/Colors';
-import {itemList} from '../../Configs/ItemList';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 export default function GenerateScreen({navigation}) {
+  const [text, setText] = useState('');
+
+  function handleTextChange(text) {
+    if (text.length <= 100) {
+      setText(text);
+    } else {
+      alert('Maximum limit reached');
+    }
+  }
+
+  function handleSubmit() {
+    if (text.length) {
+      navigation.navigate('ScannedResult', {
+        data: text,
+        type: 'QRCODE',
+      });
+    }
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={[styles.headerText]}>Generate</Text>
       </View>
 
-      <View style={styles.content}>
-        <FlatList
-          data={itemList}
-          renderItem={({item}) => (
-            <View style={styles.itemContainer}>
-              <View style={[styles.icon, {backgroundColor: item.color}]}>
-                <TouchableOpacity onPress={() => alert(item.label)}>
-                  <MaterialIcons
-                    name={item.iconName}
-                    size={20}
-                    color={colors.white}
-                  />
-                </TouchableOpacity>
-              </View>
-              <Text style={styles.item}>{item.label}</Text>
-            </View>
-          )}
-          keyExtractor={item => item.label}
-          numColumns={2}
-          columnWrapperStyle={{flex: 1, justifyContent: 'center'}}
+      <ScrollView style={styles.content}>
+        <TextInput
+          autoFocus={true}
+          placeholder={'Write here'}
+          placeholderTextColor={colors.lightGray}
+          style={styles.textArea}
+          multiline={true}
+          numberOfLines={7}
+          onChangeText={value => handleTextChange(value)}
+          value={text}
+          blurOnSubmit={true}
         />
-      </View>
+        <View style={styles.textLimitView}>
+          <Text style={{color: colors.black}}>{text.length}/100</Text>
+        </View>
+        <TouchableOpacity style={styles.button} onPress={() => handleSubmit()}>
+          <Text style={styles.buttonText}>Generate</Text>
+        </TouchableOpacity>
+      </ScrollView>
 
       <BottomNav navigation={navigation} routeName="generate" />
     </View>
@@ -72,27 +86,39 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     width: '100%',
     display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
     padding: 20,
+    flex: 1,
   },
-  itemContainer: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '45%',
-    padding: 25,
+  textArea: {
+    width: '100%',
+    padding: 10,
+    fontSize: 18,
     borderWidth: 1,
     borderColor: colors.border,
     borderRadius: 5,
-    margin: 10,
+    color: colors.black,
   },
-  icon: {
-    borderRadius: 50,
-    padding: 10,
+  textLimitView: {
+    width: '99%',
+    display: 'flex',
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',
+    marginVertical: 8,
   },
-  item: {
-    fontSize: 15,
-    fontWeight: 'bold',
+  button: {
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.yellow,
+    borderWidth: 1,
+    borderColor: colors.darkGray,
+    borderRadius: 5,
+    paddingVertical: 7,
+    marginVertical: 12,
+  },
+  buttonText: {
+    fontSize: 17,
+    color: colors.darkGray,
   },
 });

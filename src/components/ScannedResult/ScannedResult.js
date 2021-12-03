@@ -13,6 +13,7 @@ import {colors} from '../../Configs/Colors';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Feather from 'react-native-vector-icons/Feather';
 import Clipboard from '@react-native-clipboard/clipboard';
+import QrCarde from '../QrCard/QrCarde';
 
 export default function ScannedResult({route, navigation}) {
   const [copied, setCopied] = useState(false);
@@ -46,6 +47,7 @@ export default function ScannedResult({route, navigation}) {
       const result = await Share.share({
         title: 'Scanned using QRScanner App',
         message: data,
+        url: 'https://www.eyenews.uk.com/media/11135/eyejj15-tech-review-fig-1.png?width=699&height=699',
       });
       if (result.action === Share.sharedAction) {
         if (result.activityType) {
@@ -138,6 +140,8 @@ export default function ScannedResult({route, navigation}) {
             )}
           </View>
         )}
+
+        <QrCarde data={output} />
       </View>
 
       <BottomNav navigation={navigation} routeName="scannedResult" />
