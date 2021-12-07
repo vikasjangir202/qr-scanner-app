@@ -7,6 +7,7 @@ import {
   Linking,
   Share,
   ScrollView,
+  Alert,
 } from 'react-native';
 import BottomNav from '../BottomNav/BottomNav';
 import {colors} from '../../Configs/Colors';
@@ -15,14 +16,43 @@ import Feather from 'react-native-vector-icons/Feather';
 import Clipboard from '@react-native-clipboard/clipboard';
 import QrCarde from '../QrCard/QrCarde';
 
+import SQLite from 'react-native-sqlite-storage';
+var database_name = 'qrdata'; // Add your Database name
+var database_version = '1.0'; // Add your Database Version
+var database_size = 200000; // Add your Database Size
+var database_displayname = 'SQL Database'; // Add your Database Displayname
+var db;
+
 export default function ScannedResult({route, navigation}) {
   const [copied, setCopied] = useState(false);
   const [output, setOutput] = useState('');
   const [qrType, setQrType] = useState('');
   const [sms, setSms] = useState('');
 
+  function getTime() {
+    let today = new Date();
+    let date =
+      today.getFullYear() +
+      '-' +
+      (today.getMonth() + 1) +
+      '-' +
+      today.getDate();
+    let time =
+      today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
+    let dateTime = date + ' ' + time;
+    return dateTime;
+  }
+
+  function errorCB(err) {
+    console.log('SQL Error: ' + err);
+  }
+
+  function openCB() {
+    console.log('Database OPENED');
+  }
+
   useEffect(() => {
-    let {data} = route.params;
+    let {data, flag, from} = route.params;
     console.log(data);
 
     if (data.includes('tel:')) {
@@ -39,6 +69,31 @@ export default function ScannedResult({route, navigation}) {
       setOutput(`${split[0]}\n${split[1]}`);
     } else {
       setOutput(data);
+    }
+
+    if (from !== 'history') {
+      //save data to db
+      db = SQLite.openDatabase(
+        database_name,
+        database_version,
+        database_displayname,
+        database_size,
+        openCB(),
+        errorCB(),
+      );
+      db.transaction(function (tx) {
+        console.log('test');
+        tx.executeSql(
+          'INSERT INTO qr_data (data, flag, created_at) VALUES (?,?,?)',
+          [data, flag ? flag : 'scanned', getTime()],
+          (tx, results) => {
+            console.log('Results', results.rowsAffected);
+            if (results.rowsAffected === 0) {
+              Alert.alert('Registration Failed');
+            }
+          },
+        );
+      });
     }
   }, [route.params]);
 
@@ -77,7 +132,8 @@ export default function ScannedResult({route, navigation}) {
         <View style={styles.resultArea}>
           <ScrollView
             persistentScrollbar={true}
-            showsVerticalScrollIndicator={true}>
+            showsVerticalScrollIndicator={true}
+            maxHeight={'90%'}>
             <Text style={{fontSize: 20, color: 'black'}}>{output}</Text>
           </ScrollView>
         </View>
@@ -188,7 +244,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     borderWidth: 1,
     borderColor: colors.border,
-    maxHeight: '50%',
+    maxHeight: '40%',
     borderRadius: 5,
   },
   buttonContainer: {

@@ -18,6 +18,8 @@ target 'qrScanner' do
 
   pod 'RNQrGenerator', :path => '../node_modules/rn-qr-generator'
 
+  pod 'react-native-sqlite-storage', :path => '../node_modules/react-native-sqlite-storage'
+
   target 'qrScannerTests' do
     inherit! :complete
     # Pods for testing

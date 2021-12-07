@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
+  Alert,
 } from 'react-native';
 import BottomNav from '../../components/BottomNav/BottomNav';
 import {colors} from '../../Configs/Colors';
@@ -17,7 +18,7 @@ export default function GenerateScreen({navigation}) {
     if (text.length <= 100) {
       setText(text);
     } else {
-      alert('Maximum limit reached');
+      Alert.alert('Alert', 'Maximum limit reached');
     }
   }
 
@@ -26,7 +27,10 @@ export default function GenerateScreen({navigation}) {
       navigation.navigate('ScannedResult', {
         data: text,
         type: 'QRCODE',
+        flag: 'generated',
       });
+    } else {
+      Alert.alert('Alert', 'Cannot generate QRCode for empty message');
     }
   }
 
@@ -38,7 +42,6 @@ export default function GenerateScreen({navigation}) {
 
       <ScrollView style={styles.content}>
         <TextInput
-          autoFocus={true}
           placeholder={'Write here'}
           placeholderTextColor={colors.lightGray}
           style={styles.textArea}
