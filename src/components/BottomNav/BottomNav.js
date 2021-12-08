@@ -34,8 +34,8 @@ export default function BottomNav({navigation, routeName}) {
           <TouchableOpacity
             style={styles.navButtons}
             onPress={() => navigation.navigate('Home')}>
-            <MaterialIcons
-              name="qr-code-scanner"
+            <MaterialCommunityIcons
+              name="qrcode-scan"
               size={30}
               color={colors.darkGray}
               style={styles.middleIcon}

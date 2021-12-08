@@ -85,7 +85,7 @@ export default function ScannedResult({route, navigation}) {
         console.log('test');
         tx.executeSql(
           'INSERT INTO qr_data (data, flag, created_at) VALUES (?,?,?)',
-          [data, flag ? flag : 'scanned', getTime()],
+          [data, flag ? flag : 'scanned', new Date().toISOString()],
           (tx, results) => {
             console.log('Results', results.rowsAffected);
             if (results.rowsAffected === 0) {

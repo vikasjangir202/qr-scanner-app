@@ -43,7 +43,7 @@ export default function HistoryScreen({navigation}) {
     let data = [];
     await db.transaction(tx => {
       tx.executeSql(
-        'SELECT * FROM qr_data order by id desc',
+        'SELECT * FROM qr_data order by created_at desc',
         [],
         (tx, results) => {
           let len = results.rows.length;
@@ -52,12 +52,32 @@ export default function HistoryScreen({navigation}) {
           }
           if (data.length) {
             setHistory(data);
-            setRender(data.filter(item => item.flag === card));
+
+            // this gives an object with dates as keys
+            const groups = data
+              .filter(item => item.flag === card)
+              .reduce((groups, game) => {
+                const date = game.created_at.split('T')[0];
+                if (!groups[date]) {
+                  groups[date] = [];
+                }
+                groups[date].push(game);
+                return groups;
+              }, {});
+
+            // Edit: to add it in the array format instead
+            const groupArrays = Object.keys(groups).map(date => {
+              return {
+                date,
+                games: groups[date],
+              };
+            });
+
+            setRender(groupArrays);
           } else {
             setHistory([]);
             setRender([]);
           }
-          console.log(data);
         },
       );
     });
@@ -67,14 +87,54 @@ export default function HistoryScreen({navigation}) {
     if (type === 'generated') {
       setCardType('generated');
       if (history) {
-        setRender(history.filter(item => item.flag === 'generated'));
+        // this gives an object with dates as keys
+        const groups = history
+          .filter(item => item.flag === 'generated')
+          .reduce((groups, game) => {
+            const date = game.created_at.split('T')[0];
+            if (!groups[date]) {
+              groups[date] = [];
+            }
+            groups[date].push(game);
+            return groups;
+          }, {});
+
+        // Edit: to add it in the array format instead
+        const groupArrays = Object.keys(groups).map(date => {
+          return {
+            date,
+            games: groups[date],
+          };
+        });
+
+        setRender(groupArrays);
       } else {
         setRender([]);
       }
     } else {
       setCardType('scanned');
       if (history) {
-        setRender(history.filter(item => item.flag === 'scanned'));
+        // this gives an object with dates as keys
+        const groups = history
+          .filter(item => item.flag === 'scanned')
+          .reduce((groups, game) => {
+            const date = game.created_at.split('T')[0];
+            if (!groups[date]) {
+              groups[date] = [];
+            }
+            groups[date].push(game);
+            return groups;
+          }, {});
+
+        // Edit: to add it in the array format instead
+        const groupArrays = Object.keys(groups).map(date => {
+          return {
+            date,
+            games: groups[date],
+          };
+        });
+
+        setRender(groupArrays);
       } else {
         setRender([]);
       }
@@ -166,34 +226,49 @@ export default function HistoryScreen({navigation}) {
 
         <ScrollView style={styles.historyList}>
           {render &&
-            render.map(item => (
-              <TouchableOpacity
-                key={item.id}
-                onPress={() =>
-                  navigation.navigate('ScannedResult', {
-                    data: item.data,
-                    type: 'QRCODE',
-                    flag: 'scanned',
-                    from: 'history',
-                  })
-                }>
-                <View style={styles.itemCard}>
-                  <View>
-                    <Text style={styles.label} numberOfLines={1}>
-                      {item.data}
-                    </Text>
-                    <Text style={{color: 'gray', fontSize: 10}}>
-                      {item.created_at}
-                    </Text>
-                  </View>
-
-                  <MaterialIcons
-                    name="keyboard-arrow-right"
-                    size={20}
-                    color={colors.black}
-                  />
+            render.map(outer => (
+              <>
+                <View style={styles.dateView}>
+                  <Text style={styles.dateLabel}>
+                    {outer.date === new Date().toISOString().split('T')[0]
+                      ? 'Today'
+                      : outer.date ===
+                        new Date(Date.now() - 864e5).toISOString().split('T')[0]
+                      ? 'Yesterday'
+                      : outer.date.split('-')[2] +
+                        '-' +
+                        outer.date.split('-')[1] +
+                        '-' +
+                        outer.date.split('-')[0]}
+                  </Text>
                 </View>
-              </TouchableOpacity>
+                {outer.games.map(item => (
+                  <TouchableOpacity
+                    key={item.id}
+                    onPress={() =>
+                      navigation.navigate('ScannedResult', {
+                        data: item.data,
+                        type: 'QRCODE',
+                        flag: 'scanned',
+                        from: 'history',
+                      })
+                    }>
+                    <View style={styles.itemCard}>
+                      <View>
+                        <Text style={styles.label} numberOfLines={1}>
+                          {item.data}
+                        </Text>
+                      </View>
+
+                      <MaterialIcons
+                        name="keyboard-arrow-right"
+                        size={20}
+                        color={colors.black}
+                      />
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </>
             ))}
 
           {render && render.length === 0 && (
@@ -257,7 +332,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderBottomWidth: 1,
+    borderWidth: 1,
     borderColor: colors.border,
     padding: 20,
     marginVertical: 10,
@@ -282,5 +357,20 @@ const styles = StyleSheet.create({
     width: '100%',
     padding: 20,
     height: '65%',
+  },
+  dateView: {
+    display: 'flex',
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 5,
+  },
+  dateLabel: {
+    fontSize: 14,
+    backgroundColor: 'whitesmoke',
+    paddingVertical: 2,
+    paddingHorizontal: 9,
+    borderRadius: 5,
+    borderWidth: 0.5,
   },
 });
