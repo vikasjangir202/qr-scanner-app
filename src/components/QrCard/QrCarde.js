@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {View, Text, StyleSheet, Image} from 'react-native';
 import RNQRGenerator from 'rn-qr-generator';
-import {colors} from '../../Configs/Colors';
+import {colors} from '../../Helpers/Colors';
 
 export default function QrCarde({data}) {
   const [imageUri, setImageUri] = useState();

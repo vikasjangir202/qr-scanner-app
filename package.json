@@ -17,6 +17,7 @@
     "react-native": "0.66.1",
     "react-native-barcode-mask": "^1.2.4",
     "react-native-camera": "^4.2.1",
+    "react-native-cli": "^2.0.1",
     "react-native-grid-component": "^2.0.1",
     "react-native-image-picker": "^0.28.0",
     "react-native-safe-area-context": "^3.3.2",

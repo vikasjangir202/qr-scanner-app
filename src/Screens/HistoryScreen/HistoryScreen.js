@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {useState, useEffect} from 'react';
 import {
   View,
@@ -9,7 +10,7 @@ import {
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import BottomNav from '../../components/BottomNav/BottomNav';
-import {colors} from '../../Configs/Colors';
+import {colors} from '../../Helpers/Colors';
 
 import SQLite from 'react-native-sqlite-storage';
 var database_name = 'qrdata'; // Add your Database name
@@ -228,7 +229,7 @@ export default function HistoryScreen({navigation}) {
           {render &&
             render.map(outer => (
               <>
-                <View style={styles.dateView}>
+                <View style={styles.dateView} key={outer.date}>
                   <Text style={styles.dateLabel}>
                     {outer.date === new Date().toISOString().split('T')[0]
                       ? 'Today'
@@ -366,6 +367,7 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   dateLabel: {
+    color: colors.darkGray,
     fontSize: 14,
     backgroundColor: 'whitesmoke',
     paddingVertical: 2,

@@ -3,7 +3,7 @@ import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import Octicons from 'react-native-vector-icons/Octicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {colors} from '../../Configs/Colors';
+import {colors} from '../../Helpers/Colors';
 
 export default function BottomNav({navigation, routeName}) {
   return (

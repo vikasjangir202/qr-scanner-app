@@ -10,7 +10,7 @@ import {
   Alert,
 } from 'react-native';
 import BottomNav from '../BottomNav/BottomNav';
-import {colors} from '../../Configs/Colors';
+import {colors} from '../../Helpers/Colors';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Feather from 'react-native-vector-icons/Feather';
 import Clipboard from '@react-native-clipboard/clipboard';

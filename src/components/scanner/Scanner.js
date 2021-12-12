@@ -5,7 +5,7 @@ import BarcodeMask from 'react-native-barcode-mask';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import * as ImagePicker from 'react-native-image-picker';
 import RNQRGenerator from 'rn-qr-generator';
-import {colors} from '../../Configs/Colors';
+import {colors} from '../../Helpers/Colors';
 import BottomNav from '../BottomNav/BottomNav';
 
 class Scanner extends Component {
@@ -56,7 +56,7 @@ class Scanner extends Component {
         includeBase64: true,
       },
       response => {
-        // console.log('Response = ', response);
+        console.log('Response = ', response);
 
         if (response.didCancel) {
           console.log('User cancelled image picker');

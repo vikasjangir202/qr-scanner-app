@@ -9,7 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import BottomNav from '../../components/BottomNav/BottomNav';
-import {colors} from '../../Configs/Colors';
+import {colors} from '../../Helpers/Colors';
 
 export default function GenerateScreen({navigation}) {
   const [text, setText] = useState('');
