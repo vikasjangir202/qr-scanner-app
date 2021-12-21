@@ -4,6 +4,7 @@ import {RNCamera} from 'react-native-camera';
 import BarcodeMask from 'react-native-barcode-mask';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import * as ImagePicker from 'react-native-image-picker';
+import {Slider} from '@miblanchard/react-native-slider';
 import RNQRGenerator from 'rn-qr-generator';
 import {colors} from '../../Helpers/Colors';
 import BottomNav from '../BottomNav/BottomNav';
@@ -119,6 +120,21 @@ class Scanner extends Component {
             edgeRadius={5}
           />
         </RNCamera>
+        <View style={styles.sliderView}>
+          <Text style={[styles.sliderLabel, {left: 35}]}>-</Text>
+          <Slider
+            value={this.state.zoom}
+            containerStyle={styles.sliderOverLay}
+            onValueChange={value =>
+              this.setState({
+                zoom: parseFloat(value[0].toFixed(1)),
+              })
+            }
+            thumbTintColor={colors.yellow}
+            trackStyle={{backgroundColor: colors.white, height: 2}}
+          />
+          <Text style={[styles.sliderLabel, {right: 35}]}>+</Text>
+        </View>
         <View style={[styles.overlay, styles.topOverlay]}>
           <Text style={styles.scanScreenMessage}>
             Align the QR code within the frame to scan
@@ -204,13 +220,30 @@ const styles = {
     alignItems: 'center',
   },
   topOverlay: {
-    top: 150,
+    top: 120,
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     display: 'flex',
     width: '100%',
+  },
+  sliderLabel: {
+    color: colors.yellow,
+    fontSize: 25,
+    position: 'absolute',
+    bottom: 165,
+  },
+  sliderView: {
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  sliderOverLay: {
+    width: 250,
+    bottom: 160,
+    position: 'absolute',
   },
 
   topOverlayButtons: {
