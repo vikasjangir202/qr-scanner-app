@@ -8,6 +8,7 @@ import {
   Share,
   ScrollView,
   Alert,
+  useColorScheme,
 } from 'react-native';
 import BottomNav from '../BottomNav/BottomNav';
 import {colors} from '../../Helpers/Colors';
@@ -24,24 +25,11 @@ var database_displayname = 'SQL Database'; // Add your Database Displayname
 var db;
 
 export default function ScannedResult({route, navigation}) {
+  const colorScheme = useColorScheme() === 'light' ? 1 : 0;
   const [copied, setCopied] = useState(false);
   const [output, setOutput] = useState('');
   const [qrType, setQrType] = useState('');
   const [sms, setSms] = useState('');
-
-  function getTime() {
-    let today = new Date();
-    let date =
-      today.getFullYear() +
-      '-' +
-      (today.getMonth() + 1) +
-      '-' +
-      today.getDate();
-    let time =
-      today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
-    let dateTime = date + ' ' + time;
-    return dateTime;
-  }
 
   function errorCB(err) {
     console.log('SQL Error: ' + err);
@@ -51,6 +39,19 @@ export default function ScannedResult({route, navigation}) {
     console.log('Database OPENED');
   }
 
+  function validURL(str) {
+    var pattern = new RegExp(
+      '^(https?:\\/\\/)?' + // protocol
+        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+        '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+        '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+        '(\\#[-a-z\\d_]*)?$',
+      'i',
+    ); // fragment locator
+    return !!pattern.test(str);
+  }
+
   useEffect(() => {
     let {data, flag, from} = route.params;
     console.log(data);
@@ -58,7 +59,7 @@ export default function ScannedResult({route, navigation}) {
     if (data.includes('tel:')) {
       setOutput(data.replace('tel:', ''));
       setQrType('call');
-    } else if (data.includes('http') || data.includes('https')) {
+    } else if (validURL(data)) {
       setOutput(data);
       setQrType('url');
     } else if (data.includes('SMSTO:')) {
@@ -123,23 +124,56 @@ export default function ScannedResult({route, navigation}) {
     Clipboard.setString(str);
   }
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={[styles.headerText]}>Result</Text>
+    <View
+      style={[
+        styles.container,
+        {backgroundColor: colorScheme ? colors.lightWhite : colors.gray},
+      ]}>
+      <View
+        style={[
+          styles.header,
+          {backgroundColor: colorScheme ? colors.white : colors.darkGray},
+        ]}>
+        <Text
+          style={[
+            styles.headerText,
+            {color: colorScheme ? colors.black : colors.white},
+          ]}>
+          Result
+        </Text>
       </View>
 
-      <View style={styles.content}>
-        <View style={styles.resultArea}>
+      <View
+        style={[
+          styles.content,
+          {backgroundColor: colorScheme ? colors.white : colors.darkGray},
+        ]}>
+        <View
+          style={[
+            styles.resultArea,
+            {backgroundColor: colorScheme ? colors.white : colors.gray},
+          ]}>
           <ScrollView
             persistentScrollbar={true}
-            showsVerticalScrollIndicator={true}
-            maxHeight={'90%'}>
-            <Text style={{fontSize: 20, color: 'black'}}>{output}</Text>
+            showsVerticalScrollIndicator={true}>
+            <Text
+              style={{
+                fontSize: 20,
+                color: colorScheme ? colors.black : colors.white,
+              }}>
+              {output}
+            </Text>
           </ScrollView>
         </View>
 
         <View
-          style={[styles.buttonContainer, {justifyContent: 'space-around'}]}>
+          style={[
+            styles.buttonContainer,
+            {
+              justifyContent: 'space-around',
+              backgroundColor: colorScheme ? colors.white : colors.gray,
+            },
+          ]}>
           <TouchableOpacity
             onPress={() => handleCopy(output)}
             style={styles.buttons}>
@@ -148,14 +182,26 @@ export default function ScannedResult({route, navigation}) {
               size={25}
               color={colors.yellow}
             />
-            <Text style={styles.buttonLabels}>Copy</Text>
+            <Text
+              style={[
+                styles.buttonLabels,
+                {color: colorScheme ? colors.black : colors.white},
+              ]}>
+              Copy
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             onPress={() => handleOnShare(output)}
             style={styles.buttons}>
             <MaterialIcons name="share" size={25} color={colors.yellow} />
-            <Text style={styles.buttonLabels}>Share</Text>
+            <Text
+              style={[
+                styles.buttonLabels,
+                {color: colorScheme ? colors.black : colors.white},
+              ]}>
+              Share
+            </Text>
           </TouchableOpacity>
         </View>
         {qrType !== '' && (
@@ -165,7 +211,13 @@ export default function ScannedResult({route, navigation}) {
                 onPress={() => Linking.openURL(`tel:${output}`)}
                 style={styles.buttons}>
                 <MaterialIcons name="phone" size={25} color={colors.yellow} />
-                <Text style={styles.buttonLabels}>Call</Text>
+                <Text
+                  style={[
+                    styles.buttonLabels,
+                    {color: colorScheme ? colors.black : colors.white},
+                  ]}>
+                  Call
+                </Text>
               </TouchableOpacity>
             )}
 
@@ -174,7 +226,13 @@ export default function ScannedResult({route, navigation}) {
                 onPress={() => Linking.openURL(`sms:${sms}`)}
                 style={styles.buttons}>
                 <MaterialIcons name="sms" size={25} color={colors.yellow} />
-                <Text style={styles.buttonLabels}>Message</Text>
+                <Text
+                  style={[
+                    styles.buttonLabels,
+                    {color: colorScheme ? colors.black : colors.white},
+                  ]}>
+                  Message
+                </Text>
               </TouchableOpacity>
             )}
 
@@ -191,7 +249,13 @@ export default function ScannedResult({route, navigation}) {
                 }
                 style={styles.buttons}>
                 <Feather name="globe" size={25} color={colors.yellow} />
-                <Text style={styles.buttonLabels}>Browser</Text>
+                <Text
+                  style={[
+                    styles.buttonLabels,
+                    {color: colorScheme ? colors.black : colors.white},
+                  ]}>
+                  Browser
+                </Text>
               </TouchableOpacity>
             )}
           </View>

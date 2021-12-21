@@ -7,16 +7,18 @@ import {
   TextInput,
   ScrollView,
   Alert,
+  useColorScheme,
 } from 'react-native';
 import BottomNav from '../../components/BottomNav/BottomNav';
 import {colors} from '../../Helpers/Colors';
 
 export default function GenerateScreen({navigation}) {
+  const colorScheme = useColorScheme() === 'light' ? 1 : 0;
   const [text, setText] = useState('');
 
-  function handleTextChange(text) {
-    if (text.length <= 100) {
-      setText(text);
+  function handleTextChange(inputValue) {
+    if (inputValue.length <= 100) {
+      setText(inputValue);
     } else {
       Alert.alert('Alert', 'Maximum limit reached');
     }
@@ -35,16 +37,37 @@ export default function GenerateScreen({navigation}) {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={[styles.headerText]}>Generate</Text>
+    <View
+      style={[
+        styles.container,
+        {backgroundColor: colorScheme ? colors.lightWhite : colors.gray},
+      ]}>
+      <View
+        style={[
+          styles.header,
+          {backgroundColor: colorScheme ? colors.white : colors.darkGray},
+        ]}>
+        <Text
+          style={[
+            styles.headerText,
+            {color: colorScheme ? colors.black : colors.white},
+          ]}>
+          Generate
+        </Text>
       </View>
 
-      <ScrollView style={styles.content}>
+      <ScrollView
+        style={[
+          styles.content,
+          {backgroundColor: colorScheme ? colors.white : colors.darkGray},
+        ]}>
         <TextInput
           placeholder={'Write here'}
           placeholderTextColor={colors.lightGray}
-          style={styles.textArea}
+          style={[
+            styles.textArea,
+            {color: colorScheme ? colors.black : colors.white},
+          ]}
           multiline={true}
           numberOfLines={7}
           onChangeText={value => handleTextChange(value)}
@@ -52,7 +75,9 @@ export default function GenerateScreen({navigation}) {
           blurOnSubmit={true}
         />
         <View style={styles.textLimitView}>
-          <Text style={{color: colors.black}}>{text.length}/100</Text>
+          <Text style={{color: colorScheme ? colors.black : colors.white}}>
+            {text.length}/100
+          </Text>
         </View>
         <TouchableOpacity style={styles.button} onPress={() => handleSubmit()}>
           <Text style={styles.buttonText}>Generate</Text>
@@ -73,7 +98,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.lightWhite,
   },
   header: {
-    backgroundColor: colors.white,
     width: '100%',
     padding: 15,
     display: 'flex',
@@ -83,7 +107,6 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 20,
-    color: colors.black,
   },
   content: {
     backgroundColor: colors.white,

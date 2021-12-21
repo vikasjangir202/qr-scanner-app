@@ -1,14 +1,24 @@
 import React from 'react';
-import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  useColorScheme,
+} from 'react-native';
 import Octicons from 'react-native-vector-icons/Octicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {colors} from '../../Helpers/Colors';
 
 export default function BottomNav({navigation, routeName}) {
+  const colorScheme = useColorScheme() === 'light' ? 1 : 0;
   return (
     <View style={styles.overlay}>
-      <View style={styles.bottomOverlay}>
+      <View
+        style={[
+          styles.bottomOverlay,
+          {backgroundColor: colorScheme ? colors.darkGray : colors.gray},
+        ]}>
         <TouchableOpacity
           style={styles.navButtons}
           onPress={() => navigation.navigate('History')}>
@@ -77,7 +87,6 @@ const styles = StyleSheet.create({
     bottom: 5,
   },
   bottomOverlay: {
-    backgroundColor: colors.darkGray,
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',

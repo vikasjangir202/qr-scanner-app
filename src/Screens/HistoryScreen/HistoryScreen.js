@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  useColorScheme,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import BottomNav from '../../components/BottomNav/BottomNav';
@@ -20,6 +21,7 @@ var database_displayname = 'SQL Database'; // Add your Database Displayname
 var db;
 
 export default function HistoryScreen({navigation}) {
+  const colorScheme = useColorScheme() === 'light' ? 1 : 0;
   const [card, setCardType] = useState('scanned');
   const [history, setHistory] = useState();
   const [render, setRender] = useState();
@@ -166,7 +168,50 @@ export default function HistoryScreen({navigation}) {
                 if (results.rowsAffected > 0) {
                   Alert.alert(
                     'Done',
-                    'History Cleared Successfully',
+                    'History Cleared',
+                    [
+                      {
+                        text: 'Ok',
+                        onPress: () => {
+                          getHistory();
+                        },
+                      },
+                    ],
+                    {cancelable: false},
+                  );
+                }
+              },
+            );
+          });
+        },
+      },
+    ]);
+  }
+
+  function handleSingleDelete(id) {
+    //get histroy from db
+    db = SQLite.openDatabase(
+      database_name,
+      database_version,
+      database_displayname,
+      database_size,
+    );
+    Alert.alert('Alert', 'Are you sure ?', [
+      {
+        text: 'Cancel',
+      },
+      {
+        text: 'ok',
+        onPress: () => {
+          db.transaction(tx => {
+            tx.executeSql(
+              'DELETE FROM qr_data where id=?',
+              [id],
+              (tx, results) => {
+                if (results.rowsAffected > 0) {
+                  Alert.alert(
+                    'Success',
+                    'Record deleted',
                     [
                       {
                         text: 'Ok',
@@ -187,24 +232,55 @@ export default function HistoryScreen({navigation}) {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
+    <View
+      style={[
+        styles.container,
+        {backgroundColor: colorScheme ? colors.lightWhite : colors.gray},
+      ]}>
+      <View
+        style={[
+          styles.header,
+          {backgroundColor: colorScheme ? colors.white : colors.darkGray},
+        ]}>
         <Text />
-        <Text style={[styles.headerText]}>History</Text>
+        <Text
+          style={[
+            styles.headerText,
+            {color: colorScheme ? colors.black : colors.white},
+          ]}>
+          History
+        </Text>
         <TouchableOpacity onPress={() => handleHistoryDelete()}>
-          <MaterialIcons name="delete" color={colors.darkGray} size={23} />
+          <MaterialIcons
+            name="delete"
+            color={colorScheme ? colors.darkGray : colors.lightWhite}
+            size={23}
+          />
         </TouchableOpacity>
       </View>
-
-      <View style={styles.content}>
+      <View
+        style={[
+          styles.content,
+          {backgroundColor: colorScheme ? colors.white : colors.darkGray},
+        ]}>
         <View style={styles.scannedGenerated}>
           <TouchableOpacity
             onPress={() => handleCardType('scanned')}
             style={[
               styles.Topbuttons,
               {borderBottomWidth: card === 'scanned' ? 2 : 0},
+              {borderColor: colorScheme ? colors.black : colors.yellow},
             ]}>
-            <Text style={styles.headerText}>Scanned</Text>
+            <Text
+              style={[
+                styles.headerText,
+                {
+                  opacity: card === 'scanned' ? 1 : 0.5,
+                },
+                {color: colorScheme ? colors.black : colors.white},
+              ]}>
+              Scanned
+            </Text>
           </TouchableOpacity>
           <View style={styles.middleBorder} />
           <TouchableOpacity
@@ -212,25 +288,39 @@ export default function HistoryScreen({navigation}) {
             style={[
               styles.Topbuttons,
               {borderBottomWidth: card === 'generated' ? 2 : 0},
+              {borderColor: colorScheme ? colors.black : colors.yellow},
             ]}>
             <Text
               style={[
                 styles.headerText,
                 {
-                  color: card === 'generated' ? colors.black : colors.lightGray,
+                  opacity: card === 'generated' ? 1 : 0.5,
                 },
+                {color: colorScheme ? colors.black : colors.white},
               ]}>
               Generated
             </Text>
           </TouchableOpacity>
         </View>
 
-        <ScrollView style={styles.historyList}>
+        <ScrollView
+          style={styles.historyList}
+          contentContainerStyle={{paddingBottom: 30}}>
           {render &&
             render.map(outer => (
               <>
                 <View style={styles.dateView} key={outer.date}>
-                  <Text style={styles.dateLabel}>
+                  <Text
+                    style={[
+                      styles.dateLabel,
+                      {
+                        backgroundColor: colorScheme
+                          ? 'whitesmoke'
+                          : colors.gray,
+                        // borderColor: colorScheme ? colors.black : colors.white,
+                        color: colorScheme ? colors.black : colors.white,
+                      },
+                    ]}>
                     {outer.date === new Date().toISOString().split('T')[0]
                       ? 'Today'
                       : outer.date ===
@@ -253,10 +343,26 @@ export default function HistoryScreen({navigation}) {
                         flag: 'scanned',
                         from: 'history',
                       })
-                    }>
-                    <View style={styles.itemCard}>
+                    }
+                    onLongPress={() => handleSingleDelete(item.id)}>
+                    <View
+                      style={[
+                        styles.itemCard,
+                        {
+                          backgroundColor: colorScheme
+                            ? 'whitesmoke'
+                            : colors.gray,
+                        },
+                      ]}>
                       <View>
-                        <Text style={styles.label} numberOfLines={1}>
+                        <Text
+                          style={[
+                            styles.label,
+                            {
+                              color: colorScheme ? colors.black : colors.white,
+                            },
+                          ]}
+                          numberOfLines={1}>
                           {item.data}
                         </Text>
                       </View>
@@ -264,7 +370,7 @@ export default function HistoryScreen({navigation}) {
                       <MaterialIcons
                         name="keyboard-arrow-right"
                         size={20}
-                        color={colors.black}
+                        color={colorScheme ? colors.black : colors.white}
                       />
                     </View>
                   </TouchableOpacity>
@@ -273,30 +379,43 @@ export default function HistoryScreen({navigation}) {
             ))}
 
           {render && render.length === 0 && (
-            <View style={styles.noResults}>
-              <Text style={styles.label} numberOfLines={1}>
+            <View
+              style={[
+                styles.noResults,
+                {
+                  backgroundColor: colorScheme ? colors.white : colors.gray,
+                },
+              ]}>
+              <Text
+                style={[
+                  styles.label,
+                  {color: colorScheme ? colors.black : colors.white},
+                ]}
+                numberOfLines={1}>
                 No results found
               </Text>
             </View>
           )}
         </ScrollView>
+        <View style={styles.item} />
       </View>
-
       <BottomNav navigation={navigation} routeName="history" />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  item: {
+    width: '100%',
+    height: '43%',
+  },
   container: {
     display: 'flex',
     justifyContent: 'flex-start',
     alignItems: 'center',
     flex: 1,
-    backgroundColor: colors.lightWhite,
   },
   header: {
-    backgroundColor: colors.white,
     width: '100%',
     padding: 15,
     display: 'flex',
@@ -307,10 +426,8 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 18,
-    color: colors.black,
   },
   content: {
-    backgroundColor: colors.white,
     width: '100%',
     display: 'flex',
     justifyContent: 'center',
@@ -333,11 +450,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colors.border,
     padding: 20,
     marginVertical: 10,
-    backgroundColor: 'whitesmoke',
+    backgroundColor: colors.gray,
     borderRadius: 5,
     width: '100%',
   },
@@ -346,18 +461,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    borderBottomWidth: 1,
-    borderColor: colors.border,
     padding: 18,
     marginVertical: 10,
     backgroundColor: 'whitesmoke',
     borderRadius: 5,
   },
-  label: {fontSize: 16, color: colors.darkGray},
+  label: {fontSize: 16},
   historyList: {
     width: '100%',
     padding: 20,
-    height: '65%',
   },
   dateView: {
     display: 'flex',
@@ -367,12 +479,11 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   dateLabel: {
-    color: colors.darkGray,
-    fontSize: 14,
-    backgroundColor: 'whitesmoke',
-    paddingVertical: 2,
-    paddingHorizontal: 9,
-    borderRadius: 5,
+    fontSize: 12,
+    paddingVertical: 3,
+    paddingHorizontal: 12,
+    borderRadius: 3,
     borderWidth: 0.5,
+    borderColor: 'transparent',
   },
 });
