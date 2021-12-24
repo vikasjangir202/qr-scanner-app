@@ -1,13 +1,15 @@
 import React, {Component} from 'react';
-import {Text, TouchableOpacity, View} from 'react-native';
+import {Text, TouchableOpacity, View, useColorScheme} from 'react-native';
 import {RNCamera} from 'react-native-camera';
 import BarcodeMask from 'react-native-barcode-mask';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import * as ImagePicker from 'react-native-image-picker';
 import {Slider} from '@miblanchard/react-native-slider';
 import RNQRGenerator from 'rn-qr-generator';
+import SwipeUpDownModal from 'react-native-swipe-modal-up-down';
 import {colors} from '../../Helpers/Colors';
-import BottomNav from '../BottomNav/BottomNav';
+import ScannedResult from '../ScannedResult/ScannedResult';
 
 class Scanner extends Component {
   constructor(props) {
@@ -25,14 +27,25 @@ class Scanner extends Component {
         message: null,
         data: null,
       },
+      ShowComment: false,
+      animateModal: false,
+      modalData: {
+        data: '',
+        flag: 'scanned',
+        from: 'scanner',
+      },
     };
   }
 
   onBarCodeRead(scanResult) {
     if (scanResult.data != null) {
-      this.props.navigation.navigate('ScannedResult', {
-        data: scanResult.data,
-        type: scanResult.type,
+      this.setState({
+        modalData: {
+          data: scanResult.data,
+        },
+      });
+      this.setState({
+        ShowComment: true,
       });
     }
     return;
@@ -75,9 +88,13 @@ class Scanner extends Component {
               .then(response => {
                 const {values} = response; // Array of detected QR code values. Empty if nothing found.
                 if (values[0]) {
-                  this.props.navigation.navigate('ScannedResult', {
-                    data: values[0],
-                    type: 'QRCODE',
+                  this.setState({
+                    modalData: {
+                      data: values[0],
+                    },
+                  });
+                  this.setState({
+                    ShowComment: true,
                   });
                 } else {
                   alert('QrCode not found in given image');
@@ -92,34 +109,42 @@ class Scanner extends Component {
 
   render() {
     return (
-      <View style={styles.container}>
-        <RNCamera
-          ref={ref => {
-            this.camera = ref;
-          }}
-          flashMode={this.state.camera.flashMode}
-          onBarCodeRead={this.onBarCodeRead.bind(this)}
-          androidCameraPermissionOptions={{
-            title: 'Permission to use camera',
-            message: 'We need your permission to use your camera',
-            buttonPositive: 'Ok',
-            buttonNegative: 'Cancel',
-          }}
-          captureAudio={false}
-          style={styles.preview}
-          type={this.state.camera.type}
-          zoom={this.state.zoom}>
-          <BarcodeMask
-            edgeColor={colors.yellow}
-            showAnimatedLine={true}
-            animatedLineColor={colors.yellow}
-            lineAnimationDuration={2000}
-            width={300}
-            height={300}
-            outerMaskOpacity={0.7}
-            edgeRadius={5}
-          />
-        </RNCamera>
+      <View
+        style={[
+          styles.container,
+          {
+            backgroundColor: colors.darkGray,
+          },
+        ]}>
+        {!this.state.ShowComment && (
+          <RNCamera
+            ref={ref => {
+              this.camera = ref;
+            }}
+            flashMode={this.state.camera.flashMode}
+            onBarCodeRead={this.onBarCodeRead.bind(this)}
+            androidCameraPermissionOptions={{
+              title: 'Permission to use camera',
+              message: 'We need your permission to use your camera',
+              buttonPositive: 'Ok',
+              buttonNegative: 'Cancel',
+            }}
+            captureAudio={false}
+            style={styles.preview}
+            type={this.state.camera.type}
+            zoom={this.state.zoom}>
+            <BarcodeMask
+              edgeColor={colors.yellow}
+              showAnimatedLine={true}
+              animatedLineColor={colors.yellow}
+              lineAnimationDuration={2000}
+              width={300}
+              height={300}
+              outerMaskOpacity={0.7}
+              edgeRadius={5}
+            />
+          </RNCamera>
+        )}
         <View style={styles.sliderView}>
           <Text style={[styles.sliderLabel, {left: 35}]}>-</Text>
           <Slider
@@ -197,13 +222,69 @@ class Scanner extends Component {
             </Text>
           </TouchableOpacity>
         </View>
-        <BottomNav navigation={this.props.navigation} routeName="" />
+
+        <SwipeUpDownModal
+          modalVisible={this.state.ShowComment}
+          PressToanimate={this.state.animateModal}
+          //if you don't pass HeaderContent you should pass marginTop in view of ContentModel to Make modal swipeable
+          ContentModal={
+            <View style={styles.containerContent}>
+              <ScannedResult route={this.state.modalData} />
+            </View>
+          }
+          HeaderStyle={styles.headerContent}
+          ContentModalStyle={styles.Modal}
+          duration={300}
+          HeaderContent={
+            <View style={styles.containerHeader}>
+              <TouchableOpacity
+                onPress={() => {
+                  this.setState({animateModal: true});
+                }}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginTop: 80,
+                }}>
+                <Text style={{color: colors.lightGray, fontSize: 10}}>
+                  Click here or swipe down to close
+                </Text>
+                <SimpleLineIcons
+                  name="arrow-down"
+                  size={17}
+                  color={colors.lightGray}
+                />
+              </TouchableOpacity>
+            </View>
+          }
+          onClose={() => {
+            this.setState({ShowComment: false});
+            this.setState({animateModal: false});
+          }}
+        />
       </View>
     );
   }
 }
 
 const styles = {
+  containerContent: {flex: 1, marginTop: 50},
+  containerHeader: {
+    flex: 1,
+    alignContent: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerContent: {
+    marginTop: 0,
+  },
+  Modal: {
+    backgroundColor: colors.darkGray,
+    marginTop: 60,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
   container: {
     flex: 1,
   },
@@ -232,7 +313,7 @@ const styles = {
     color: colors.yellow,
     fontSize: 25,
     position: 'absolute',
-    bottom: 165,
+    bottom: 115,
   },
   sliderView: {
     width: '100%',
@@ -242,7 +323,7 @@ const styles = {
   },
   sliderOverLay: {
     width: 250,
-    bottom: 160,
+    bottom: 110,
     position: 'absolute',
   },
 

@@ -1,31 +1,92 @@
 import React from 'react';
-import {SafeAreaView} from 'react-native';
+import {SafeAreaView, StyleSheet} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import HomeScreen from './src/Screens/HomeScreen/HomeScreen';
-import HistoryScreen from './src/Screens/HistoryScreen/HistoryScreen';
 import GenerateScreen from './src/Screens/GenerateScreen/GenerateScreen';
-import ScannedResult from './src/components/ScannedResult/ScannedResult';
+import HistroyTabs from './src/Screens/HistoryScreen/HistroyTabs';
+import {colors} from './src/Helpers/Colors';
+import Octicons from 'react-native-vector-icons/Octicons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
 
 function App() {
   return (
     <SafeAreaView style={{flex: 1}}>
       <NavigationContainer>
-        <Stack.Navigator
+        <Tab.Navigator
           initialRouteName="Home"
           screenOptions={{
             headerShown: false,
+            tabBarStyle: {backgroundColor: colors.darkGray, borderWidth: 0},
           }}>
-          <Stack.Screen name="Home" component={HomeScreen} />
-          <Stack.Screen name="History" component={HistoryScreen} />
-          <Stack.Screen name="Generate" component={GenerateScreen} />
-          <Stack.Screen name="ScannedResult" component={ScannedResult} />
-        </Stack.Navigator>
+          <Tab.Screen
+            options={{
+              title: 'History',
+              tabBarActiveTintColor: colors.yellow,
+              tabBarInactiveTintColor: colors.lightGray,
+              tabBarIcon: tabInfo => {
+                return (
+                  <Octicons
+                    name="history"
+                    size={25}
+                    color={tabInfo.focused ? colors.yellow : colors.lightGray}
+                  />
+                );
+              },
+            }}
+            name="HistroyTabs"
+            component={HistroyTabs}
+          />
+          <Tab.Screen
+            options={{
+              title: 'Scan',
+              tabBarActiveTintColor: colors.yellow,
+              tabBarInactiveTintColor: colors.lightGray,
+              tabBarIcon: tabInfo => {
+                return (
+                  <MaterialCommunityIcons
+                    name="barcode-scan"
+                    size={25}
+                    color={tabInfo.focused ? colors.yellow : colors.lightGray}
+                  />
+                );
+              },
+            }}
+            name="Home"
+            component={HomeScreen}
+          />
+          <Tab.Screen
+            options={{
+              title: 'Generate',
+              tabBarActiveTintColor: colors.yellow,
+              tabBarInactiveTintColor: colors.lightGray,
+              tabBarIcon: tabInfo => {
+                return (
+                  <MaterialCommunityIcons
+                    name="view-grid-plus-outline"
+                    size={25}
+                    color={tabInfo.focused ? colors.yellow : colors.lightGray}
+                  />
+                );
+              },
+            }}
+            name="Generate"
+            component={GenerateScreen}
+          />
+        </Tab.Navigator>
       </NavigationContainer>
     </SafeAreaView>
   );
 }
 
 export default App;
+const styles = StyleSheet.create({
+  middleIcon: {
+    backgroundColor: colors.yellow,
+    borderRadius: 50,
+    borderWidth: 2,
+    borderColor: colors.darkGray,
+  },
+});

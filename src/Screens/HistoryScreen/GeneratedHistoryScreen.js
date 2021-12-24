@@ -10,21 +10,32 @@ import {
   useColorScheme,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import BottomNav from '../../components/BottomNav/BottomNav';
+import SwipeUpDownModal from 'react-native-swipe-modal-up-down';
 import {colors} from '../../Helpers/Colors';
-
 import SQLite from 'react-native-sqlite-storage';
+import Loading from '../../components/Loading/Loading';
+import ScannedResult from '../../components/ScannedResult/ScannedResult';
+import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
+
 var database_name = 'qrdata'; // Add your Database name
 var database_version = '1.0'; // Add your Database Version
 var database_size = 200000; // Add your Database Size
 var database_displayname = 'SQL Database'; // Add your Database Displayname
 var db;
 
-export default function HistoryScreen({navigation}) {
+export default function GeneratedHistoryScreen() {
   const colorScheme = useColorScheme() === 'light' ? 1 : 0;
-  const [card, setCardType] = useState('scanned');
+  const [card, setCardType] = useState('generated');
   const [history, setHistory] = useState();
   const [render, setRender] = useState();
+  const [loading, setLoading] = useState(true);
+  let [ShowComment, setShowModelComment] = useState(false);
+  let [animateModal, setanimateModal] = useState(false);
+  let [modalData, setModalData] = useState({
+    data: '',
+    flag: 'scanned',
+    from: 'scanner',
+  });
 
   useEffect(() => {
     getHistory();
@@ -77,115 +88,15 @@ export default function HistoryScreen({navigation}) {
             });
 
             setRender(groupArrays);
+            setLoading(false);
           } else {
             setHistory([]);
             setRender([]);
+            setLoading(false);
           }
         },
       );
     });
-  }
-
-  function handleCardType(type) {
-    if (type === 'generated') {
-      setCardType('generated');
-      if (history) {
-        // this gives an object with dates as keys
-        const groups = history
-          .filter(item => item.flag === 'generated')
-          .reduce((groups, game) => {
-            const date = game.created_at.split('T')[0];
-            if (!groups[date]) {
-              groups[date] = [];
-            }
-            groups[date].push(game);
-            return groups;
-          }, {});
-
-        // Edit: to add it in the array format instead
-        const groupArrays = Object.keys(groups).map(date => {
-          return {
-            date,
-            games: groups[date],
-          };
-        });
-
-        setRender(groupArrays);
-      } else {
-        setRender([]);
-      }
-    } else {
-      setCardType('scanned');
-      if (history) {
-        // this gives an object with dates as keys
-        const groups = history
-          .filter(item => item.flag === 'scanned')
-          .reduce((groups, game) => {
-            const date = game.created_at.split('T')[0];
-            if (!groups[date]) {
-              groups[date] = [];
-            }
-            groups[date].push(game);
-            return groups;
-          }, {});
-
-        // Edit: to add it in the array format instead
-        const groupArrays = Object.keys(groups).map(date => {
-          return {
-            date,
-            games: groups[date],
-          };
-        });
-
-        setRender(groupArrays);
-      } else {
-        setRender([]);
-      }
-    }
-  }
-
-  function handleHistoryDelete() {
-    //get histroy from db
-    db = SQLite.openDatabase(
-      database_name,
-      database_version,
-      database_displayname,
-      database_size,
-    );
-
-    Alert.alert('Alert', 'Are you sure ?', [
-      {
-        text: 'Cancel',
-      },
-      {
-        text: 'ok',
-        onPress: () => {
-          db.transaction(tx => {
-            tx.executeSql(
-              'DELETE FROM qr_data where flag=?',
-              [card === 'scanned' ? 'scanned' : 'generated'],
-              (tx, results) => {
-                if (results.rowsAffected > 0) {
-                  Alert.alert(
-                    'Done',
-                    'History Cleared',
-                    [
-                      {
-                        text: 'Ok',
-                        onPress: () => {
-                          getHistory();
-                        },
-                      },
-                    ],
-                    {cancelable: false},
-                  );
-                }
-              },
-            );
-          });
-        },
-      },
-    ]);
   }
 
   function handleSingleDelete(id) {
@@ -233,76 +144,13 @@ export default function HistoryScreen({navigation}) {
 
   return (
     <View
-      style={[
-        styles.container,
-        {backgroundColor: colorScheme ? colors.lightWhite : colors.gray},
-      ]}>
-      <View
-        style={[
-          styles.header,
-          {backgroundColor: colorScheme ? colors.white : colors.darkGray},
-        ]}>
-        <Text />
-        <Text
-          style={[
-            styles.headerText,
-            {color: colorScheme ? colors.black : colors.white},
-          ]}>
-          History
-        </Text>
-        <TouchableOpacity onPress={() => handleHistoryDelete()}>
-          <MaterialIcons
-            name="delete"
-            color={colorScheme ? colors.darkGray : colors.lightWhite}
-            size={23}
-          />
-        </TouchableOpacity>
-      </View>
-      <View
-        style={[
-          styles.content,
-          {backgroundColor: colorScheme ? colors.white : colors.darkGray},
-        ]}>
-        <View style={styles.scannedGenerated}>
-          <TouchableOpacity
-            onPress={() => handleCardType('scanned')}
-            style={[
-              styles.Topbuttons,
-              {borderBottomWidth: card === 'scanned' ? 2 : 0},
-              {borderColor: colorScheme ? colors.black : colors.yellow},
-            ]}>
-            <Text
-              style={[
-                styles.headerText,
-                {
-                  opacity: card === 'scanned' ? 1 : 0.5,
-                },
-                {color: colorScheme ? colors.black : colors.white},
-              ]}>
-              Scanned
-            </Text>
-          </TouchableOpacity>
-          <View style={styles.middleBorder} />
-          <TouchableOpacity
-            onPress={() => handleCardType('generated')}
-            style={[
-              styles.Topbuttons,
-              {borderBottomWidth: card === 'generated' ? 2 : 0},
-              {borderColor: colorScheme ? colors.black : colors.yellow},
-            ]}>
-            <Text
-              style={[
-                styles.headerText,
-                {
-                  opacity: card === 'generated' ? 1 : 0.5,
-                },
-                {color: colorScheme ? colors.black : colors.white},
-              ]}>
-              Generated
-            </Text>
-          </TouchableOpacity>
-        </View>
-
+      style={{
+        backgroundColor: colorScheme ? colors.white : colors.gray,
+        flex: 1,
+      }}>
+      {loading ? (
+        <Loading />
+      ) : (
         <ScrollView
           style={styles.historyList}
           contentContainerStyle={{paddingBottom: 30}}>
@@ -316,8 +164,7 @@ export default function HistoryScreen({navigation}) {
                       {
                         backgroundColor: colorScheme
                           ? 'whitesmoke'
-                          : colors.gray,
-                        // borderColor: colorScheme ? colors.black : colors.white,
+                          : colors.darkGray,
                         color: colorScheme ? colors.black : colors.white,
                       },
                     ]}>
@@ -336,14 +183,15 @@ export default function HistoryScreen({navigation}) {
                 {outer.games.map(item => (
                   <TouchableOpacity
                     key={item.id}
-                    onPress={() =>
-                      navigation.navigate('ScannedResult', {
+                    onPress={() => {
+                      setModalData({
                         data: item.data,
                         type: 'QRCODE',
-                        flag: 'scanned',
+                        flag: 'generated',
                         from: 'history',
-                      })
-                    }
+                      });
+                      setShowModelComment(true);
+                    }}
                     onLongPress={() => handleSingleDelete(item.id)}>
                     <View
                       style={[
@@ -351,7 +199,7 @@ export default function HistoryScreen({navigation}) {
                         {
                           backgroundColor: colorScheme
                             ? 'whitesmoke'
-                            : colors.gray,
+                            : colors.darkGray,
                         },
                       ]}>
                       <View>
@@ -397,17 +245,72 @@ export default function HistoryScreen({navigation}) {
             </View>
           )}
         </ScrollView>
-        <View style={styles.item} />
-      </View>
-      <BottomNav navigation={navigation} routeName="history" />
+      )}
+
+      <SwipeUpDownModal
+        modalVisible={ShowComment}
+        PressToanimate={animateModal}
+        //if you don't pass HeaderContent you should pass marginTop in view of ContentModel to Make modal swipeable
+        ContentModal={
+          <View style={styles.containerContent}>
+            <ScannedResult route={modalData} />
+          </View>
+        }
+        HeaderStyle={styles.headerContent}
+        ContentModalStyle={styles.Modal}
+        duration={300}
+        HeaderContent={
+          <View style={styles.containerHeader}>
+            <TouchableOpacity
+              onPress={() => {
+                setanimateModal(true);
+              }}
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: 80,
+              }}>
+              <Text style={{color: colors.lightGray, fontSize: 10}}>
+                Click here or swipe down to close
+              </Text>
+              <SimpleLineIcons
+                name="arrow-down"
+                size={17}
+                color={colors.lightGray}
+              />
+            </TouchableOpacity>
+          </View>
+        }
+        onClose={() => {
+          setanimateModal(false);
+          setShowModelComment(false);
+        }}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  containerContent: {flex: 1, marginTop: 50},
+  containerHeader: {
+    flex: 1,
+    alignContent: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerContent: {
+    marginTop: 0,
+  },
+  Modal: {
+    backgroundColor: colors.darkGray,
+    marginTop: 60,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
   item: {
     width: '100%',
-    height: '43%',
+    // height: '43%',
   },
   container: {
     display: 'flex',

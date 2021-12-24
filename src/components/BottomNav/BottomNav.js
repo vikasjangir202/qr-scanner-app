@@ -21,10 +21,10 @@ export default function BottomNav({navigation, routeName}) {
         ]}>
         <TouchableOpacity
           style={styles.navButtons}
-          onPress={() => navigation.navigate('History')}>
+          onPress={() => navigation.navigate('HistroyTabs')}>
           <Octicons
             name="history"
-            size={25}
+            size={20}
             color={routeName === 'history' ? colors.yellow : colors.lightGray}
           />
 
@@ -46,7 +46,7 @@ export default function BottomNav({navigation, routeName}) {
             onPress={() => navigation.navigate('Home')}>
             <MaterialCommunityIcons
               name="qrcode-scan"
-              size={30}
+              size={20}
               color={colors.darkGray}
               style={styles.middleIcon}
             />
@@ -80,11 +80,10 @@ export default function BottomNav({navigation, routeName}) {
 const styles = StyleSheet.create({
   overlay: {
     position: 'absolute',
-    padding: 12,
     right: 0,
     left: 0,
     alignItems: 'center',
-    bottom: 5,
+    bottom: 0,
   },
   bottomOverlay: {
     flexDirection: 'row',
@@ -92,10 +91,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
     padding: 7,
-    borderRadius: 7,
   },
   navLabel: {
     color: colors.lightGray,
+    fontSize: 12,
   },
   navButtons: {
     display: 'flex',

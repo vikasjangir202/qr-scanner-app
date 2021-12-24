@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
 import {
   View,
@@ -9,12 +10,21 @@ import {
   Alert,
   useColorScheme,
 } from 'react-native';
-import BottomNav from '../../components/BottomNav/BottomNav';
+import SwipeUpDownModal from 'react-native-swipe-modal-up-down';
+import ScannedResult from '../../components/ScannedResult/ScannedResult';
+import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import {colors} from '../../Helpers/Colors';
 
-export default function GenerateScreen({navigation}) {
+export default function GenerateScreen() {
   const colorScheme = useColorScheme() === 'light' ? 1 : 0;
   const [text, setText] = useState('');
+  const [ShowComment, setShowModelComment] = useState(false);
+  const [animateModal, setanimateModal] = useState(false);
+  const [modalData, setModalData] = useState({
+    data: '',
+    flag: 'generated',
+    from: 'generated',
+  });
 
   function handleTextChange(inputValue) {
     if (inputValue.length <= 100) {
@@ -26,11 +36,14 @@ export default function GenerateScreen({navigation}) {
 
   function handleSubmit() {
     if (text.length) {
-      navigation.navigate('ScannedResult', {
+      setModalData({
         data: text,
         type: 'QRCODE',
         flag: 'generated',
+        from: 'generated',
       });
+      setShowModelComment(true);
+      setText('');
     } else {
       Alert.alert('Alert', 'Cannot generate QRCode for empty message');
     }
@@ -84,12 +97,70 @@ export default function GenerateScreen({navigation}) {
         </TouchableOpacity>
       </ScrollView>
 
-      <BottomNav navigation={navigation} routeName="generate" />
+      <SwipeUpDownModal
+        modalVisible={ShowComment}
+        PressToanimate={animateModal}
+        //if you don't pass HeaderContent you should pass marginTop in view of ContentModel to Make modal swipeable
+        ContentModal={
+          <View style={styles.containerContent}>
+            <ScannedResult route={modalData} />
+          </View>
+        }
+        HeaderStyle={styles.headerContent}
+        ContentModalStyle={styles.Modal}
+        duration={300}
+        HeaderContent={
+          <View style={styles.containerHeader}>
+            <TouchableOpacity
+              onPress={() => {
+                setanimateModal(true);
+              }}
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: 80,
+              }}>
+              <Text style={{color: colors.lightGray, fontSize: 10}}>
+                Click here or swipe down to close
+              </Text>
+              <SimpleLineIcons
+                name="arrow-down"
+                size={17}
+                color={colors.lightGray}
+              />
+            </TouchableOpacity>
+          </View>
+        }
+        onClose={() => {
+          setanimateModal(false);
+          setShowModelComment(false);
+        }}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  containerContent: {flex: 1, marginTop: 50},
+  containerHeader: {
+    flex: 1,
+    alignContent: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerContent: {
+    marginTop: 0,
+  },
+  Modal: {
+    backgroundColor: colors.darkGray,
+    marginTop: 60,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  item: {
+    width: '100%',
+  },
   container: {
     display: 'flex',
     justifyContent: 'flex-start',

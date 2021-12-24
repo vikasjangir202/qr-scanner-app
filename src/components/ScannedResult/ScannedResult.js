@@ -10,7 +10,6 @@ import {
   Alert,
   useColorScheme,
 } from 'react-native';
-import BottomNav from '../BottomNav/BottomNav';
 import {colors} from '../../Helpers/Colors';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Feather from 'react-native-vector-icons/Feather';
@@ -24,7 +23,7 @@ var database_size = 200000; // Add your Database Size
 var database_displayname = 'SQL Database'; // Add your Database Displayname
 var db;
 
-export default function ScannedResult({route, navigation}) {
+export default function ScannedResult({route}) {
   const colorScheme = useColorScheme() === 'light' ? 1 : 0;
   const [copied, setCopied] = useState(false);
   const [output, setOutput] = useState('');
@@ -53,8 +52,12 @@ export default function ScannedResult({route, navigation}) {
   }
 
   useEffect(() => {
-    let {data, flag, from} = route.params;
+    let {data, flag, from} = route;
+    // let data = 'https://google.com';
+    // let from = 'scanned';
+    // let flag = 'scanned';
     console.log(data);
+    console.log(route);
 
     if (data.includes('tel:')) {
       setOutput(data.replace('tel:', ''));
@@ -96,7 +99,7 @@ export default function ScannedResult({route, navigation}) {
         );
       });
     }
-  }, [route.params]);
+  }, []);
 
   const handleOnShare = async data => {
     try {
@@ -127,21 +130,9 @@ export default function ScannedResult({route, navigation}) {
     <View
       style={[
         styles.container,
-        {backgroundColor: colorScheme ? colors.lightWhite : colors.gray},
+        {backgroundColor: colorScheme ? colors.lightWhite : colors.darkGray},
       ]}>
-      <View
-        style={[
-          styles.header,
-          {backgroundColor: colorScheme ? colors.white : colors.darkGray},
-        ]}>
-        <Text
-          style={[
-            styles.headerText,
-            {color: colorScheme ? colors.black : colors.white},
-          ]}>
-          Result
-        </Text>
-      </View>
+      <QrCarde data={output} />
 
       <View
         style={[
@@ -151,7 +142,7 @@ export default function ScannedResult({route, navigation}) {
         <View
           style={[
             styles.resultArea,
-            {backgroundColor: colorScheme ? colors.white : colors.gray},
+            {backgroundColor: colorScheme ? colors.white : colors.darkGray},
           ]}>
           <ScrollView
             persistentScrollbar={true}
@@ -171,7 +162,7 @@ export default function ScannedResult({route, navigation}) {
             styles.buttonContainer,
             {
               justifyContent: 'space-around',
-              backgroundColor: colorScheme ? colors.white : colors.gray,
+              backgroundColor: colorScheme ? colors.white : colors.darkGray,
             },
           ]}>
           <TouchableOpacity
@@ -260,11 +251,7 @@ export default function ScannedResult({route, navigation}) {
             )}
           </View>
         )}
-
-        <QrCarde data={output} />
       </View>
-
-      <BottomNav navigation={navigation} routeName="scannedResult" />
     </View>
   );
 }
