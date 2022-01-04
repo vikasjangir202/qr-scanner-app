@@ -4,6 +4,7 @@ import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs
 import {colors} from '../../Helpers/Colors';
 import ScannedHistoryScreen from './ScannedHistoryScreen';
 import GeneratedHistoryScreen from './GeneratedHistoryScreen';
+import FavouriteHistoryScreen from './FavouriteHistoryScreen';
 import Header from '../../components/Header/Header';
 
 const Tab = createMaterialTopTabNavigator();
@@ -50,6 +51,16 @@ export default function HistroyTabs() {
             tabBarInactiveTintColor: colors.lightGray,
           }}
           component={GeneratedHistoryScreen}
+        />
+
+        <Tab.Screen
+          name="favouriteHistory"
+          options={{
+            title: 'Favourites',
+            tabBarActiveTintColor: colorScheme ? colors.black : colors.white,
+            tabBarInactiveTintColor: colors.lightGray,
+          }}
+          component={FavouriteHistoryScreen}
         />
       </Tab.Navigator>
     </>

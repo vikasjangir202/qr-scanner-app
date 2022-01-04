@@ -23,10 +23,9 @@ var database_size = 200000; // Add your Database Size
 var database_displayname = 'SQL Database'; // Add your Database Displayname
 var db;
 
-export default function GeneratedHistoryScreen() {
+export default function FavouriteHistoryScreen() {
   const refRBSheet = useRef();
   const colorScheme = useColorScheme() === 'light' ? 1 : 0;
-  const card = 'generated';
   const [render, setRender] = useState();
   const [loading, setLoading] = useState(true);
   let [modalData, setModalData] = useState({
@@ -56,7 +55,7 @@ export default function GeneratedHistoryScreen() {
           if (data.length) {
             // this gives an object with dates as keys
             const groups = data
-              .filter(item => item.flag === card)
+              .filter(item => item.fav === 1)
               .reduce((groups, game) => {
                 const date = game.created_at.split('T')[0];
                 if (!groups[date]) {
@@ -230,17 +229,14 @@ export default function GeneratedHistoryScreen() {
               </>
             ))}
 
-          {/* Empty Space */}
-          {render && (
-            <View
-              style={[
-                styles.itemCard,
-                {
-                  backgroundColor: 'transparent',
-                  marginTop: 40,
-                },
-              ]}></View>
-          )}
+          <View
+            style={[
+              styles.itemCard,
+              {
+                backgroundColor: 'transparent',
+                marginTop: 40,
+              },
+            ]}></View>
 
           {render && render.length === 0 && <NoResultsScreen />}
         </ScrollView>

@@ -30,7 +30,7 @@ export default function HomeScreen({navigation}) {
           if (res.rows.length === 0) {
             txn.executeSql('DROP TABLE IF EXISTS qr_data', []);
             txn.executeSql(
-              'CREATE TABLE IF NOT EXISTS qr_data(id INTEGER PRIMARY KEY AUTOINCREMENT, data VARCHAR(255), flag VARCHAR(10), created_at VARCHAR(50))',
+              'CREATE TABLE IF NOT EXISTS qr_data(id INTEGER PRIMARY KEY AUTOINCREMENT, data VARCHAR(255), flag VARCHAR(10), fav INTEGER(1), created_at VARCHAR(50))',
               [],
             );
           }

@@ -85,6 +85,29 @@ export default function ScannedHistoryScreen() {
     });
   }, [render]);
 
+  function handleFavourite(id, fav) {
+    if (id) {
+      db = SQLite.openDatabase(
+        database_name,
+        database_version,
+        database_displayname,
+        database_size,
+      );
+
+      db.transaction(tx => {
+        tx.executeSql(
+          'UPDATE qr_data SET fav=? where id=?',
+          [fav ? 0 : 1, id],
+          (tx, results) => {
+            if (results.rowsAffected > 0) {
+              console.log(results);
+            }
+          },
+        );
+      });
+    }
+  }
+
   function handleSingleDelete(id) {
     //get histroy from db
     db = SQLite.openDatabase(
@@ -154,47 +177,55 @@ export default function ScannedHistoryScreen() {
                   </Text>
                 </View>
                 {outer.games.map(item => (
-                  <TouchableOpacity
-                    key={item.id}
-                    onPress={() => {
-                      setModalData({
-                        data: item.data,
-                        type: 'QRCODE',
-                        flag: 'scanned',
-                        from: 'history',
-                      });
-                      refRBSheet.current.open();
-                    }}
-                    onLongPress={() => handleSingleDelete(item.id)}>
-                    <View
-                      style={[
-                        styles.itemCard,
-                        {
-                          backgroundColor: colorScheme
-                            ? '#F1F1F1'
-                            : colors.listItem,
-                        },
-                      ]}>
-                      <View>
-                        <Text
-                          style={[
-                            styles.label,
-                            {
-                              color: colorScheme ? colors.black : colors.white,
-                            },
-                          ]}
-                          numberOfLines={1}>
-                          {item.data}
-                        </Text>
+                  <View style={styles.itemContainer}>
+                    <TouchableOpacity
+                      style={{width: '100%'}}
+                      key={item.id}
+                      onPress={() => {
+                        setModalData({
+                          data: item.data,
+                          type: 'QRCODE',
+                          flag: 'scanned',
+                          from: 'history',
+                        });
+                        refRBSheet.current.open();
+                      }}
+                      onLongPress={() => handleSingleDelete(item.id)}>
+                      <View
+                        style={[
+                          styles.itemCard,
+                          {
+                            backgroundColor: colorScheme
+                              ? '#F1F1F1'
+                              : colors.listItem,
+                          },
+                        ]}>
+                        <View>
+                          <Text
+                            style={[
+                              styles.label,
+                              {
+                                color: colorScheme
+                                  ? colors.black
+                                  : colors.white,
+                              },
+                            ]}
+                            numberOfLines={1}>
+                            {item.data}
+                          </Text>
+                        </View>
                       </View>
-
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={{position: 'absolute', right: 20}}
+                      onPress={() => handleFavourite(item.id, item.fav)}>
                       <MaterialIcons
-                        name="keyboard-arrow-right"
-                        size={20}
-                        color={colorScheme ? colors.black : colors.white}
+                        name={item.fav ? 'favorite' : 'favorite-border'}
+                        size={25}
+                        color={colors.yellow}
                       />
-                    </View>
-                  </TouchableOpacity>
+                    </TouchableOpacity>
+                  </View>
                 ))}
               </>
             ))}
@@ -277,6 +308,12 @@ const styles = StyleSheet.create({
   middleBorder: {width: 2, backgroundColor: colors.border},
   Topbuttons: {
     padding: 8,
+  },
+  itemContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
   },
   itemCard: {
     display: 'flex',
