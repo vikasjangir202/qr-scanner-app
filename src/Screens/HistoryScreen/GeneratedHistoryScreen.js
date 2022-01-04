@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   View,
   Text,
@@ -10,12 +10,12 @@ import {
   useColorScheme,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import SwipeUpDownModal from 'react-native-swipe-modal-up-down';
 import {colors} from '../../Helpers/Colors';
 import SQLite from 'react-native-sqlite-storage';
 import Loading from '../../components/Loading/Loading';
 import ScannedResult from '../../components/ScannedResult/ScannedResult';
-import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
+import NoResultsScreen from '../../components/NoResultsScreen/NoResultsScreen';
+import RBSheet from 'react-native-raw-bottom-sheet';
 
 var database_name = 'qrdata'; // Add your Database name
 var database_version = '1.0'; // Add your Database Version
@@ -24,29 +24,18 @@ var database_displayname = 'SQL Database'; // Add your Database Displayname
 var db;
 
 export default function GeneratedHistoryScreen() {
+  const refRBSheet = useRef();
   const colorScheme = useColorScheme() === 'light' ? 1 : 0;
-  const [card, setCardType] = useState('generated');
-  const [history, setHistory] = useState();
+  const card = 'generated';
   const [render, setRender] = useState();
   const [loading, setLoading] = useState(true);
-  let [ShowComment, setShowModelComment] = useState(false);
-  let [animateModal, setanimateModal] = useState(false);
   let [modalData, setModalData] = useState({
     data: '',
-    flag: 'scanned',
-    from: 'scanner',
+    flag: 'generated',
+    from: 'history',
   });
 
   useEffect(() => {
-    getHistory();
-
-    return () => {
-      setHistory([]);
-      setRender([]);
-    };
-  }, []);
-
-  async function getHistory() {
     //get histroy from db
     db = SQLite.openDatabase(
       database_name,
@@ -55,7 +44,7 @@ export default function GeneratedHistoryScreen() {
       database_size,
     );
     let data = [];
-    await db.transaction(tx => {
+    db.transaction(tx => {
       tx.executeSql(
         'SELECT * FROM qr_data order by created_at desc',
         [],
@@ -65,8 +54,6 @@ export default function GeneratedHistoryScreen() {
             data.push(results.rows.item(i));
           }
           if (data.length) {
-            setHistory(data);
-
             // this gives an object with dates as keys
             const groups = data
               .filter(item => item.flag === card)
@@ -90,14 +77,13 @@ export default function GeneratedHistoryScreen() {
             setRender(groupArrays);
             setLoading(false);
           } else {
-            setHistory([]);
             setRender([]);
             setLoading(false);
           }
         },
       );
     });
-  }
+  }, [render]);
 
   function handleSingleDelete(id) {
     //get histroy from db
@@ -120,19 +106,6 @@ export default function GeneratedHistoryScreen() {
               [id],
               (tx, results) => {
                 if (results.rowsAffected > 0) {
-                  Alert.alert(
-                    'Success',
-                    'Record deleted',
-                    [
-                      {
-                        text: 'Ok',
-                        onPress: () => {
-                          getHistory();
-                        },
-                      },
-                    ],
-                    {cancelable: false},
-                  );
                 }
               },
             );
@@ -190,7 +163,7 @@ export default function GeneratedHistoryScreen() {
                         flag: 'generated',
                         from: 'history',
                       });
-                      setShowModelComment(true);
+                      refRBSheet.current.open();
                     }}
                     onLongPress={() => handleSingleDelete(item.id)}>
                     <View
@@ -198,8 +171,8 @@ export default function GeneratedHistoryScreen() {
                         styles.itemCard,
                         {
                           backgroundColor: colorScheme
-                            ? 'whitesmoke'
-                            : colors.darkGray,
+                            ? '#F1F1F1'
+                            : colors.listItem,
                         },
                       ]}>
                       <View>
@@ -226,92 +199,46 @@ export default function GeneratedHistoryScreen() {
               </>
             ))}
 
-          {render && render.length === 0 && (
-            <View
-              style={[
-                styles.noResults,
-                {
-                  backgroundColor: colorScheme ? colors.white : colors.gray,
-                },
-              ]}>
-              <Text
-                style={[
-                  styles.label,
-                  {color: colorScheme ? colors.black : colors.white},
-                ]}
-                numberOfLines={1}>
-                No results found
-              </Text>
-            </View>
-          )}
+          <View
+            style={[
+              styles.itemCard,
+              {
+                backgroundColor: 'transparent',
+                marginTop: 40,
+              },
+            ]}></View>
+
+          {render && render.length === 0 && <NoResultsScreen />}
         </ScrollView>
       )}
 
-      <SwipeUpDownModal
-        modalVisible={ShowComment}
-        PressToanimate={animateModal}
-        //if you don't pass HeaderContent you should pass marginTop in view of ContentModel to Make modal swipeable
-        ContentModal={
-          <View style={styles.containerContent}>
-            <ScannedResult route={modalData} />
-          </View>
-        }
-        HeaderStyle={styles.headerContent}
-        ContentModalStyle={styles.Modal}
-        duration={300}
-        HeaderContent={
-          <View style={styles.containerHeader}>
-            <TouchableOpacity
-              onPress={() => {
-                setanimateModal(true);
-              }}
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginTop: 80,
-              }}>
-              <Text style={{color: colors.lightGray, fontSize: 10}}>
-                Click here or swipe down to close
-              </Text>
-              <SimpleLineIcons
-                name="arrow-down"
-                size={17}
-                color={colors.lightGray}
-              />
-            </TouchableOpacity>
-          </View>
-        }
-        onClose={() => {
-          setanimateModal(false);
-          setShowModelComment(false);
-        }}
-      />
+      <RBSheet
+        ref={refRBSheet}
+        closeOnDragDown={true}
+        closeOnPressMask={false}
+        animationType="fade"
+        height={580}
+        customStyles={{
+          wrapper: {
+            backgroundColor: '#0000009c',
+          },
+          draggableIcon: {
+            backgroundColor: colors.lightGray,
+          },
+          container: {
+            backgroundColor: colorScheme ? colors.white : colors.darkGray,
+            borderTopLeftRadius: 30,
+            borderTopRightRadius: 30,
+            alignSelf: 'center',
+          },
+        }}>
+        <ScannedResult route={modalData} />
+      </RBSheet>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  containerContent: {flex: 1, marginTop: 50},
-  containerHeader: {
-    flex: 1,
-    alignContent: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerContent: {
-    marginTop: 0,
-  },
-  Modal: {
-    backgroundColor: colors.darkGray,
-    marginTop: 60,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-  },
-  item: {
-    width: '100%',
-    // height: '43%',
-  },
   container: {
     display: 'flex',
     justifyContent: 'flex-start',
@@ -358,16 +285,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.gray,
     borderRadius: 5,
     width: '100%',
-  },
-  noResults: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 18,
-    marginVertical: 10,
-    backgroundColor: 'whitesmoke',
-    borderRadius: 5,
   },
   label: {fontSize: 16},
   historyList: {

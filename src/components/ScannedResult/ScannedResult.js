@@ -53,11 +53,6 @@ export default function ScannedResult({route}) {
 
   useEffect(() => {
     let {data, flag, from} = route;
-    // let data = 'https://google.com';
-    // let from = 'scanned';
-    // let flag = 'scanned';
-    console.log(data);
-    console.log(route);
 
     if (data.includes('tel:')) {
       setOutput(data.replace('tel:', ''));
@@ -91,7 +86,6 @@ export default function ScannedResult({route}) {
           'INSERT INTO qr_data (data, flag, created_at) VALUES (?,?,?)',
           [data, flag ? flag : 'scanned', new Date().toISOString()],
           (tx, results) => {
-            console.log('Results', results.rowsAffected);
             if (results.rowsAffected === 0) {
               Alert.alert('Registration Failed');
             }
@@ -127,11 +121,7 @@ export default function ScannedResult({route}) {
     Clipboard.setString(str);
   }
   return (
-    <View
-      style={[
-        styles.container,
-        {backgroundColor: colorScheme ? colors.lightWhite : colors.darkGray},
-      ]}>
+    <View style={[styles.container]}>
       <QrCarde data={output} />
 
       <View
@@ -262,7 +252,6 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     flex: 1,
-    backgroundColor: colors.lightWhite,
   },
   header: {
     backgroundColor: colors.white,

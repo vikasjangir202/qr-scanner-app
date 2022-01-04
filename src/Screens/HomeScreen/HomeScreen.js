@@ -38,7 +38,8 @@ export default function HomeScreen({navigation}) {
       );
     });
 
-    setTimeout(() => setLoading(false), 2000);
+    setLoading(false);
+    // setTimeout(() => setLoading(false), 2000);
   }, []);
 
   return (

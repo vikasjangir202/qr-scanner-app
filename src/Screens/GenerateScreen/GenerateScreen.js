@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState} from 'react';
+import React, {useState, useRef} from 'react';
 import {
   View,
   Text,
@@ -10,16 +10,15 @@ import {
   Alert,
   useColorScheme,
 } from 'react-native';
-import SwipeUpDownModal from 'react-native-swipe-modal-up-down';
+import RBSheet from 'react-native-raw-bottom-sheet';
 import ScannedResult from '../../components/ScannedResult/ScannedResult';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import {colors} from '../../Helpers/Colors';
 
 export default function GenerateScreen() {
+  const refRBSheet = useRef();
   const colorScheme = useColorScheme() === 'light' ? 1 : 0;
   const [text, setText] = useState('');
-  const [ShowComment, setShowModelComment] = useState(false);
-  const [animateModal, setanimateModal] = useState(false);
   const [modalData, setModalData] = useState({
     data: '',
     flag: 'generated',
@@ -42,8 +41,8 @@ export default function GenerateScreen() {
         flag: 'generated',
         from: 'generated',
       });
-      setShowModelComment(true);
       setText('');
+      refRBSheet.current.open();
     } else {
       Alert.alert('Alert', 'Cannot generate QRCode for empty message');
     }
@@ -72,7 +71,7 @@ export default function GenerateScreen() {
       <ScrollView
         style={[
           styles.content,
-          {backgroundColor: colorScheme ? colors.white : colors.darkGray},
+          {backgroundColor: colorScheme ? colors.white : colors.gray},
         ]}>
         <TextInput
           placeholder={'Write here'}
@@ -97,76 +96,38 @@ export default function GenerateScreen() {
         </TouchableOpacity>
       </ScrollView>
 
-      <SwipeUpDownModal
-        modalVisible={ShowComment}
-        PressToanimate={animateModal}
-        //if you don't pass HeaderContent you should pass marginTop in view of ContentModel to Make modal swipeable
-        ContentModal={
-          <View style={styles.containerContent}>
-            <ScannedResult route={modalData} />
-          </View>
-        }
-        HeaderStyle={styles.headerContent}
-        ContentModalStyle={styles.Modal}
-        duration={300}
-        HeaderContent={
-          <View style={styles.containerHeader}>
-            <TouchableOpacity
-              onPress={() => {
-                setanimateModal(true);
-              }}
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginTop: 80,
-              }}>
-              <Text style={{color: colors.lightGray, fontSize: 10}}>
-                Click here or swipe down to close
-              </Text>
-              <SimpleLineIcons
-                name="arrow-down"
-                size={17}
-                color={colors.lightGray}
-              />
-            </TouchableOpacity>
-          </View>
-        }
-        onClose={() => {
-          setanimateModal(false);
-          setShowModelComment(false);
-        }}
-      />
+      <RBSheet
+        ref={refRBSheet}
+        closeOnDragDown={true}
+        closeOnPressMask={false}
+        animationType="fade"
+        height={580}
+        customStyles={{
+          wrapper: {
+            backgroundColor: '#0000009c',
+          },
+          draggableIcon: {
+            backgroundColor: colors.lightGray,
+          },
+          container: {
+            backgroundColor: colorScheme ? colors.white : colors.darkGray,
+            borderTopLeftRadius: 30,
+            borderTopRightRadius: 30,
+            alignSelf: 'center',
+          },
+        }}>
+        <ScannedResult route={modalData} />
+      </RBSheet>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  containerContent: {flex: 1, marginTop: 50},
-  containerHeader: {
-    flex: 1,
-    alignContent: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerContent: {
-    marginTop: 0,
-  },
-  Modal: {
-    backgroundColor: colors.darkGray,
-    marginTop: 60,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-  },
-  item: {
-    width: '100%',
-  },
   container: {
     display: 'flex',
     justifyContent: 'flex-start',
     alignItems: 'center',
     flex: 1,
-    backgroundColor: colors.lightWhite,
   },
   header: {
     width: '100%',

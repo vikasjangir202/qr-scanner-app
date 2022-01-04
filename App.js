@@ -1,5 +1,6 @@
+/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {SafeAreaView, StyleSheet} from 'react-native';
+import {SafeAreaView, StyleSheet, View, useColorScheme} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import HomeScreen from './src/Screens/HomeScreen/HomeScreen';
@@ -12,14 +13,28 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 const Tab = createBottomTabNavigator();
 
 function App() {
+  const colorScheme = useColorScheme() === 'light' ? 1 : 0;
+
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={[styles.container]}>
       <NavigationContainer>
         <Tab.Navigator
           initialRouteName="Home"
           screenOptions={{
             headerShown: false,
-            tabBarStyle: {backgroundColor: colors.darkGray, borderWidth: 0},
+            tabBarStyle: {
+              backgroundColor: colors.darkGray,
+              borderTopLeftRadius: 20,
+              borderTopRightRadius: 20,
+              paddingBottom: 10,
+              paddingTop: 10,
+              height: 60,
+              borderTopColor: 'transparent',
+              marginHorizontal: 10,
+              position: 'absolute',
+              left: 10,
+              right: 10,
+            },
           }}>
           <Tab.Screen
             options={{
@@ -41,16 +56,30 @@ function App() {
           />
           <Tab.Screen
             options={{
-              title: 'Scan',
+              title: '',
               tabBarActiveTintColor: colors.yellow,
               tabBarInactiveTintColor: colors.lightGray,
               tabBarIcon: tabInfo => {
                 return (
-                  <MaterialCommunityIcons
-                    name="barcode-scan"
-                    size={25}
-                    color={tabInfo.focused ? colors.yellow : colors.lightGray}
-                  />
+                  <View
+                    style={{
+                      position: 'absolute',
+                      bottom: 4, // space from bottombar
+                      height: 60,
+                      width: 60,
+                      borderRadius: 50,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      backgroundColor: colors.darkGray,
+                      borderColor: colors.yellow,
+                      borderWidth: 2,
+                    }}>
+                    <MaterialCommunityIcons
+                      name="barcode-scan"
+                      size={30}
+                      color={tabInfo.focused ? colors.yellow : colors.lightGray}
+                    />
+                  </View>
                 );
               },
             }}
@@ -83,10 +112,7 @@ function App() {
 
 export default App;
 const styles = StyleSheet.create({
-  middleIcon: {
-    backgroundColor: colors.yellow,
-    borderRadius: 50,
-    borderWidth: 2,
-    borderColor: colors.darkGray,
+  container: {
+    flex: 1,
   },
 });

@@ -8,7 +8,7 @@ import Header from '../../components/Header/Header';
 
 const Tab = createMaterialTopTabNavigator();
 
-export default function HistroyTabs({navigation}) {
+export default function HistroyTabs() {
   const colorScheme = useColorScheme() === 'light' ? 1 : 0;
   return (
     <>
@@ -21,10 +21,12 @@ export default function HistroyTabs({navigation}) {
       </View>
       <Tab.Navigator
         initialRouteName="scannedHistory"
+        tabBarPosition="top"
+        tabBarActiveTintColor="red"
         screenOptions={{
           tabBarLabelStyle: {
             fontSize: 12,
-            color: colorScheme ? colors.black : colors.white,
+            textTransform: 'none',
           },
           tabBarStyle: {
             backgroundColor: colorScheme ? colors.white : colors.darkGray,
@@ -33,12 +35,20 @@ export default function HistroyTabs({navigation}) {
         }}>
         <Tab.Screen
           name="scannedHistory"
-          options={{title: 'Scanned'}}
+          options={{
+            title: 'Scanned',
+            tabBarActiveTintColor: colorScheme ? colors.black : colors.white,
+            tabBarInactiveTintColor: colors.lightGray,
+          }}
           component={ScannedHistoryScreen}
         />
         <Tab.Screen
           name="generatedHistory"
-          options={{title: 'Generated'}}
+          options={{
+            title: 'Generated',
+            tabBarActiveTintColor: colorScheme ? colors.black : colors.white,
+            tabBarInactiveTintColor: colors.lightGray,
+          }}
           component={GeneratedHistoryScreen}
         />
       </Tab.Navigator>

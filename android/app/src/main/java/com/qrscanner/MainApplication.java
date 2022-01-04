@@ -4,6 +4,8 @@ import android.app.Application;
 import android.content.Context;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
+import com.horcrux.svg.SvgPackage;
+import com.RNFetchBlob.RNFetchBlobPackage;
 import org.pgsqlite.SQLitePluginPackage;
 import com.gevorg.reactlibrary.RNQrGeneratorPackage;
 import com.imagepicker.ImagePickerPackage;

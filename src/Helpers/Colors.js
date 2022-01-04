@@ -5,6 +5,7 @@ export const colors = {
   yellow: '#ffb824',
   darkGray: '#363636',
   lightGray: '#a4a4a4',
-  lightWhite: '#f7f7f7',
+  listItem: '#515151',
+  lightWhite: '#f2f2f2',
   border: '#d9d9d9',
 };

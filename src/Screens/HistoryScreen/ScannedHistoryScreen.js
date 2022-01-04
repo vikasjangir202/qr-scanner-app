@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   View,
   Text,
@@ -10,12 +10,12 @@ import {
   useColorScheme,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import SwipeUpDownModal from 'react-native-swipe-modal-up-down';
 import {colors} from '../../Helpers/Colors';
 import SQLite from 'react-native-sqlite-storage';
 import Loading from '../../components/Loading/Loading';
 import ScannedResult from '../../components/ScannedResult/ScannedResult';
-import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
+import NoResultsScreen from '../../components/NoResultsScreen/NoResultsScreen';
+import RBSheet from 'react-native-raw-bottom-sheet';
 
 var database_name = 'qrdata'; // Add your Database name
 var database_version = '1.0'; // Add your Database Version
@@ -24,23 +24,18 @@ var database_displayname = 'SQL Database'; // Add your Database Displayname
 var db;
 
 export default function ScannedHistoryScreen() {
+  const refRBSheet = useRef();
   const colorScheme = useColorScheme() === 'light' ? 1 : 0;
-  const [card, setCardType] = useState('scanned');
+  const card = 'scanned';
   const [render, setRender] = useState();
   const [loading, setLoading] = useState(true);
-  let [ShowComment, setShowModelComment] = useState(false);
-  let [animateModal, setanimateModal] = useState(false);
   let [modalData, setModalData] = useState({
     data: '',
     flag: 'scanned',
-    from: 'scanner',
+    from: 'history',
   });
 
   useEffect(() => {
-    getHistory();
-  }, []);
-
-  async function getHistory() {
     //get histroy from db
     db = SQLite.openDatabase(
       database_name,
@@ -49,7 +44,7 @@ export default function ScannedHistoryScreen() {
       database_size,
     );
     let data = [];
-    await db.transaction(tx => {
+    db.transaction(tx => {
       tx.executeSql(
         'SELECT * FROM qr_data order by created_at desc',
         [],
@@ -88,7 +83,7 @@ export default function ScannedHistoryScreen() {
         },
       );
     });
-  }
+  }, [render]);
 
   function handleSingleDelete(id) {
     //get histroy from db
@@ -111,19 +106,6 @@ export default function ScannedHistoryScreen() {
               [id],
               (tx, results) => {
                 if (results.rowsAffected > 0) {
-                  Alert.alert(
-                    'Success',
-                    'Record deleted',
-                    [
-                      {
-                        text: 'Ok',
-                        onPress: () => {
-                          getHistory();
-                        },
-                      },
-                    ],
-                    {cancelable: false},
-                  );
                 }
               },
             );
@@ -181,7 +163,7 @@ export default function ScannedHistoryScreen() {
                         flag: 'scanned',
                         from: 'history',
                       });
-                      setShowModelComment(true);
+                      refRBSheet.current.open();
                     }}
                     onLongPress={() => handleSingleDelete(item.id)}>
                     <View
@@ -189,8 +171,8 @@ export default function ScannedHistoryScreen() {
                         styles.itemCard,
                         {
                           backgroundColor: colorScheme
-                            ? 'whitesmoke'
-                            : colors.darkGray,
+                            ? '#F1F1F1'
+                            : colors.listItem,
                         },
                       ]}>
                       <View>
@@ -217,91 +199,49 @@ export default function ScannedHistoryScreen() {
               </>
             ))}
 
-          {render && render.length === 0 && (
+          {/* Empty Space */}
+          {render && (
             <View
               style={[
-                styles.noResults,
+                styles.itemCard,
                 {
-                  backgroundColor: colorScheme ? colors.white : colors.gray,
+                  backgroundColor: 'transparent',
+                  marginTop: 40,
                 },
-              ]}>
-              <Text
-                style={[
-                  styles.label,
-                  {color: colorScheme ? colors.black : colors.white},
-                ]}
-                numberOfLines={1}>
-                No results found
-              </Text>
-            </View>
+              ]}></View>
           )}
+
+          {render && render.length === 0 && <NoResultsScreen />}
         </ScrollView>
       )}
 
-      <SwipeUpDownModal
-        modalVisible={ShowComment}
-        PressToanimate={animateModal}
-        //if you don't pass HeaderContent you should pass marginTop in view of ContentModel to Make modal swipeable
-        ContentModal={
-          <View style={styles.containerContent}>
-            <ScannedResult route={modalData} />
-          </View>
-        }
-        HeaderStyle={styles.headerContent}
-        ContentModalStyle={styles.Modal}
-        duration={300}
-        HeaderContent={
-          <View style={styles.containerHeader}>
-            <TouchableOpacity
-              onPress={() => {
-                setanimateModal(true);
-              }}
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginTop: 80,
-              }}>
-              <Text style={{color: colors.lightGray, fontSize: 10}}>
-                Click here or swipe down to close
-              </Text>
-              <SimpleLineIcons
-                name="arrow-down"
-                size={17}
-                color={colors.lightGray}
-              />
-            </TouchableOpacity>
-          </View>
-        }
-        onClose={() => {
-          setanimateModal(false);
-          setShowModelComment(false);
-        }}
-      />
+      <RBSheet
+        ref={refRBSheet}
+        closeOnDragDown={true}
+        closeOnPressMask={false}
+        animationType="fade"
+        height={580}
+        customStyles={{
+          wrapper: {
+            backgroundColor: '#0000009c',
+          },
+          draggableIcon: {
+            backgroundColor: colors.lightGray,
+          },
+          container: {
+            backgroundColor: colorScheme ? colors.white : colors.darkGray,
+            borderTopLeftRadius: 30,
+            borderTopRightRadius: 30,
+            alignSelf: 'center',
+          },
+        }}>
+        <ScannedResult route={modalData} />
+      </RBSheet>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  containerContent: {flex: 1, marginTop: 50},
-  containerHeader: {
-    flex: 1,
-    alignContent: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerContent: {
-    marginTop: 0,
-  },
-  Modal: {
-    backgroundColor: colors.darkGray,
-    marginTop: 60,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-  },
-  item: {
-    width: '100%',
-  },
   container: {
     display: 'flex',
     justifyContent: 'flex-start',
@@ -348,16 +288,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.gray,
     borderRadius: 5,
     width: '100%',
-  },
-  noResults: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 18,
-    marginVertical: 10,
-    backgroundColor: 'whitesmoke',
-    borderRadius: 5,
   },
   label: {fontSize: 16},
   historyList: {

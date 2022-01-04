@@ -1,13 +1,12 @@
 import React, {Component} from 'react';
-import {Text, TouchableOpacity, View, useColorScheme} from 'react-native';
+import {Text, TouchableOpacity, View} from 'react-native';
 import {RNCamera} from 'react-native-camera';
 import BarcodeMask from 'react-native-barcode-mask';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import * as ImagePicker from 'react-native-image-picker';
 import {Slider} from '@miblanchard/react-native-slider';
 import RNQRGenerator from 'rn-qr-generator';
-import SwipeUpDownModal from 'react-native-swipe-modal-up-down';
+import RBSheet from 'react-native-raw-bottom-sheet';
 import {colors} from '../../Helpers/Colors';
 import ScannedResult from '../ScannedResult/ScannedResult';
 
@@ -27,13 +26,12 @@ class Scanner extends Component {
         message: null,
         data: null,
       },
-      ShowComment: false,
-      animateModal: false,
       modalData: {
         data: '',
         flag: 'scanned',
         from: 'scanner',
       },
+      ShowComment: false,
     };
   }
 
@@ -47,6 +45,7 @@ class Scanner extends Component {
       this.setState({
         ShowComment: true,
       });
+      this.RBSheet.open();
     }
     return;
   }
@@ -60,12 +59,12 @@ class Scanner extends Component {
   }
 
   openPicker() {
-    console.log('ImagePicker');
     ImagePicker.showImagePicker(
       {
         title: 'Select Image',
         mediaType: 'photo',
         takePhotoButtonTitle: '',
+        chooseFromLibraryButtonTitle: 'Choose from Library...',
         selectionLimit: 1,
         includeBase64: true,
       },
@@ -96,6 +95,7 @@ class Scanner extends Component {
                   this.setState({
                     ShowComment: true,
                   });
+                  this.RBSheet.open();
                 } else {
                   alert('QrCode not found in given image');
                 }
@@ -138,15 +138,15 @@ class Scanner extends Component {
               showAnimatedLine={true}
               animatedLineColor={colors.yellow}
               lineAnimationDuration={2000}
-              width={300}
-              height={300}
-              outerMaskOpacity={0.7}
+              width={270}
+              height={270}
+              outerMaskOpacity={0.6}
               edgeRadius={5}
             />
           </RNCamera>
         )}
         <View style={styles.sliderView}>
-          <Text style={[styles.sliderLabel, {left: 35}]}>-</Text>
+          <Text style={[styles.sliderLabel, {left: 40}]}>-</Text>
           <Slider
             value={this.state.zoom}
             containerStyle={styles.sliderOverLay}
@@ -158,7 +158,7 @@ class Scanner extends Component {
             thumbTintColor={colors.yellow}
             trackStyle={{backgroundColor: colors.white, height: 2}}
           />
-          <Text style={[styles.sliderLabel, {right: 35}]}>+</Text>
+          <Text style={[styles.sliderLabel, {right: 33}]}>+</Text>
         </View>
         <View style={[styles.overlay, styles.topOverlay]}>
           <Text style={styles.scanScreenMessage}>
@@ -223,46 +223,31 @@ class Scanner extends Component {
           </TouchableOpacity>
         </View>
 
-        <SwipeUpDownModal
-          modalVisible={this.state.ShowComment}
-          PressToanimate={this.state.animateModal}
-          //if you don't pass HeaderContent you should pass marginTop in view of ContentModel to Make modal swipeable
-          ContentModal={
-            <View style={styles.containerContent}>
-              <ScannedResult route={this.state.modalData} />
-            </View>
-          }
-          HeaderStyle={styles.headerContent}
-          ContentModalStyle={styles.Modal}
-          duration={300}
-          HeaderContent={
-            <View style={styles.containerHeader}>
-              <TouchableOpacity
-                onPress={() => {
-                  this.setState({animateModal: true});
-                }}
-                style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginTop: 80,
-                }}>
-                <Text style={{color: colors.lightGray, fontSize: 10}}>
-                  Click here or swipe down to close
-                </Text>
-                <SimpleLineIcons
-                  name="arrow-down"
-                  size={17}
-                  color={colors.lightGray}
-                />
-              </TouchableOpacity>
-            </View>
-          }
-          onClose={() => {
-            this.setState({ShowComment: false});
-            this.setState({animateModal: false});
+        <RBSheet
+          ref={ref => {
+            this.RBSheet = ref;
           }}
-        />
+          closeOnDragDown={true}
+          closeOnPressMask={false}
+          animationType="fade"
+          onClose={() => this.setState({ShowComment: false})}
+          height={580}
+          customStyles={{
+            wrapper: {
+              backgroundColor: '#0000009c',
+            },
+            draggableIcon: {
+              backgroundColor: colors.lightGray,
+            },
+            container: {
+              backgroundColor: colors.darkGray,
+              borderTopLeftRadius: 30,
+              borderTopRightRadius: 30,
+              alignSelf: 'center',
+            },
+          }}>
+          <ScannedResult route={this.state.modalData} />
+        </RBSheet>
       </View>
     );
   }
@@ -313,7 +298,7 @@ const styles = {
     color: colors.yellow,
     fontSize: 25,
     position: 'absolute',
-    bottom: 115,
+    bottom: 155,
   },
   sliderView: {
     width: '100%',
@@ -323,7 +308,7 @@ const styles = {
   },
   sliderOverLay: {
     width: 250,
-    bottom: 110,
+    bottom: 150,
     position: 'absolute',
   },
 
