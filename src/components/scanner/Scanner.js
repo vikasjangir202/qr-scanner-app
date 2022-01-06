@@ -59,7 +59,7 @@ class Scanner extends Component {
   }
 
   openPicker() {
-    ImagePicker.showImagePicker(
+    ImagePicker.launchImageLibrary(
       {
         title: 'Select Image',
         mediaType: 'photo',
@@ -286,7 +286,7 @@ const styles = {
     alignItems: 'center',
   },
   topOverlay: {
-    top: 120,
+    top: 150,
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'center',
