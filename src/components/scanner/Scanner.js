@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Text, TouchableOpacity, View} from 'react-native';
+import {Text, TouchableOpacity, View, Alert} from 'react-native';
 import {RNCamera} from 'react-native-camera';
 import BarcodeMask from 'react-native-barcode-mask';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -69,23 +69,20 @@ class Scanner extends Component {
         includeBase64: true,
       },
       response => {
-        console.log('Response = ', response);
-
         if (response.didCancel) {
-          console.log('User cancelled image picker');
+          // console.log('User cancelled image picker');
         } else if (response.error) {
-          console.log('ImagePicker Error: ', response.error);
+          // console.log('ImagePicker Error: ', response.error);
         } else if (response.customButton) {
-          console.log('User tapped custom button: ', response.customButton);
+          // console.log('User tapped custom button: ', response.customButton);
         } else {
           if (response.uri) {
-            console.log(response);
             RNQRGenerator.detect({
               uri: response.path,
               base64: response.uri,
             })
-              .then(response => {
-                const {values} = response; // Array of detected QR code values. Empty if nothing found.
+              .then(qrGenResponse => {
+                const {values} = qrGenResponse; // Array of detected QR code values. Empty if nothing found.
                 if (values[0]) {
                   this.setState({
                     modalData: {
@@ -97,10 +94,12 @@ class Scanner extends Component {
                   });
                   this.RBSheet.open();
                 } else {
-                  alert('QrCode not found in given image');
+                  Alert.alert('', 'QrCode not found in given image');
                 }
               })
-              .catch(error => alert('QrCode not found in given image'));
+              .catch(error =>
+                Alert.alert('', 'QrCode not found in given image'),
+              );
           }
         }
       },

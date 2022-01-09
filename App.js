@@ -1,6 +1,5 @@
-/* eslint-disable react-native/no-inline-styles */
 import React, {useEffect} from 'react';
-import {SafeAreaView, StyleSheet, View, useColorScheme} from 'react-native';
+import {SafeAreaView, StyleSheet, View} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import HomeScreen from './src/Screens/HomeScreen/HomeScreen';
@@ -14,14 +13,12 @@ import SplashScreen from 'react-native-splash-screen';
 const Tab = createBottomTabNavigator();
 
 function App() {
-  const colorScheme = useColorScheme() === 'light' ? 1 : 0;
-
   useEffect(() => {
     SplashScreen.hide();
   }, []);
 
   return (
-    <SafeAreaView style={[styles.container]}>
+    <SafeAreaView style={styles.container}>
       <NavigationContainer>
         <Tab.Navigator
           initialRouteName="Home"
@@ -66,21 +63,9 @@ function App() {
               tabBarInactiveTintColor: colors.lightGray,
               tabBarIcon: tabInfo => {
                 return (
-                  <View
-                    style={{
-                      position: 'absolute',
-                      bottom: 4, // space from bottombar
-                      height: 60,
-                      width: 60,
-                      borderRadius: 50,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      backgroundColor: colors.darkGray,
-                      borderColor: colors.yellow,
-                      borderWidth: 2,
-                    }}>
+                  <View style={styles.middleIcon}>
                     <MaterialCommunityIcons
-                      name="barcode-scan"
+                      name="qrcode-scan"
                       size={30}
                       color={tabInfo.focused ? colors.yellow : colors.lightGray}
                     />
@@ -119,5 +104,17 @@ export default App;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  middleIcon: {
+    position: 'absolute',
+    bottom: 4, // space from bottombar
+    height: 60,
+    width: 60,
+    borderRadius: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.darkGray,
+    borderColor: colors.yellow,
+    borderWidth: 2,
   },
 });

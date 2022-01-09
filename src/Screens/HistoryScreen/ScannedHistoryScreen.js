@@ -6,8 +6,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Alert,
-  useColorScheme,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {colors} from '../../Helpers/Colors';
@@ -16,6 +14,8 @@ import Loading from '../../components/Loading/Loading';
 import ScannedResult from '../../components/ScannedResult/ScannedResult';
 import NoResultsScreen from '../../components/NoResultsScreen/NoResultsScreen';
 import RBSheet from 'react-native-raw-bottom-sheet';
+import {handleFavourite, handleSingleDelete} from '../../Helpers/functions';
+import EmptySpace from '../../components/EmptySpace/EmptySpace';
 
 var database_name = 'qrdata'; // Add your Database name
 var database_version = '1.0'; // Add your Database Version
@@ -25,8 +25,6 @@ var db;
 
 export default function ScannedHistoryScreen() {
   const refRBSheet = useRef();
-  const colorScheme = useColorScheme() === 'light' ? 1 : 0;
-  const card = 'scanned';
   const [render, setRender] = useState();
   const [loading, setLoading] = useState(true);
   let [modalData, setModalData] = useState({
@@ -46,8 +44,8 @@ export default function ScannedHistoryScreen() {
     let data = [];
     db.transaction(tx => {
       tx.executeSql(
-        'SELECT * FROM qr_data order by created_at desc',
-        [],
+        'SELECT * FROM qr_data WHERE flag=? ORDER BY created_at DESC',
+        ['scanned'],
         (tx, results) => {
           let len = results.rows.length;
           for (let i = 0; i < len; i++) {
@@ -55,16 +53,14 @@ export default function ScannedHistoryScreen() {
           }
           if (data.length) {
             // this gives an object with dates as keys
-            const groups = data
-              .filter(item => item.flag === card)
-              .reduce((groups, game) => {
-                const date = game.created_at.split('T')[0];
-                if (!groups[date]) {
-                  groups[date] = [];
-                }
-                groups[date].push(game);
-                return groups;
-              }, {});
+            const groups = data.reduce((groups, game) => {
+              const date = game.created_at.split('T')[0];
+              if (!groups[date]) {
+                groups[date] = [];
+              }
+              groups[date].push(game);
+              return groups;
+            }, {});
 
             // Edit: to add it in the array format instead
             const groupArrays = Object.keys(groups).map(date => {
@@ -85,63 +81,10 @@ export default function ScannedHistoryScreen() {
     });
   }, [render]);
 
-  function handleFavourite(id, fav) {
-    if (id) {
-      db = SQLite.openDatabase(
-        database_name,
-        database_version,
-        database_displayname,
-        database_size,
-      );
-
-      db.transaction(tx => {
-        tx.executeSql(
-          'UPDATE qr_data SET fav=? where id=?',
-          [fav ? 0 : 1, id],
-          (tx, results) => {
-            if (results.rowsAffected > 0) {
-              console.log(results);
-            }
-          },
-        );
-      });
-    }
-  }
-
-  function handleSingleDelete(id) {
-    //get histroy from db
-    db = SQLite.openDatabase(
-      database_name,
-      database_version,
-      database_displayname,
-      database_size,
-    );
-    Alert.alert('Alert', 'Are you sure ?', [
-      {
-        text: 'Cancel',
-      },
-      {
-        text: 'ok',
-        onPress: () => {
-          db.transaction(tx => {
-            tx.executeSql(
-              'DELETE FROM qr_data where id=?',
-              [id],
-              (tx, results) => {
-                if (results.rowsAffected > 0) {
-                }
-              },
-            );
-          });
-        },
-      },
-    ]);
-  }
-
   return (
     <View
       style={{
-        backgroundColor: colorScheme ? colors.white : colors.gray,
+        backgroundColor: colors.gray,
         flex: 1,
       }}>
       {loading ? (
@@ -158,10 +101,8 @@ export default function ScannedHistoryScreen() {
                     style={[
                       styles.dateLabel,
                       {
-                        backgroundColor: colorScheme
-                          ? 'whitesmoke'
-                          : colors.darkGray,
-                        color: colorScheme ? colors.black : colors.white,
+                        backgroundColor: colors.darkGray,
+                        color: colors.white,
                       },
                     ]}>
                     {outer.date === new Date().toISOString().split('T')[0]
@@ -195,9 +136,7 @@ export default function ScannedHistoryScreen() {
                         style={[
                           styles.itemCard,
                           {
-                            backgroundColor: colorScheme
-                              ? '#F1F1F1'
-                              : colors.listItem,
+                            backgroundColor: colors.listItem,
                           },
                         ]}>
                         <View>
@@ -205,9 +144,7 @@ export default function ScannedHistoryScreen() {
                             style={[
                               styles.label,
                               {
-                                color: colorScheme
-                                  ? colors.black
-                                  : colors.white,
+                                color: colors.white,
                               },
                             ]}
                             numberOfLines={1}>
@@ -230,17 +167,7 @@ export default function ScannedHistoryScreen() {
               </>
             ))}
 
-          {/* Empty Space */}
-          {render && (
-            <View
-              style={[
-                styles.itemCard,
-                {
-                  backgroundColor: 'transparent',
-                  marginTop: 40,
-                },
-              ]}></View>
-          )}
+          {render && <EmptySpace />}
 
           {render && render.length === 0 && <NoResultsScreen />}
         </ScrollView>
@@ -260,7 +187,7 @@ export default function ScannedHistoryScreen() {
             backgroundColor: colors.lightGray,
           },
           container: {
-            backgroundColor: colorScheme ? colors.white : colors.darkGray,
+            backgroundColor: colors.darkGray,
             borderTopLeftRadius: 30,
             borderTopRightRadius: 30,
             alignSelf: 'center',
@@ -273,42 +200,6 @@ export default function ScannedHistoryScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    display: 'flex',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    flex: 1,
-  },
-  header: {
-    width: '100%',
-    padding: 15,
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  headerText: {
-    fontSize: 18,
-  },
-  content: {
-    width: '100%',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  scannedGenerated: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    width: '100%',
-    padding: 3,
-    paddingBottom: 15,
-  },
-  middleBorder: {width: 2, backgroundColor: colors.border},
-  Topbuttons: {
-    padding: 8,
-  },
   itemContainer: {
     display: 'flex',
     flexDirection: 'row',

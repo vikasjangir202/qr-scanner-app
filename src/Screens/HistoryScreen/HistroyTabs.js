@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, StyleSheet, useColorScheme} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import {colors} from '../../Helpers/Colors';
 import ScannedHistoryScreen from './ScannedHistoryScreen';
@@ -10,14 +10,9 @@ import Header from '../../components/Header/Header';
 const Tab = createMaterialTopTabNavigator();
 
 export default function HistroyTabs() {
-  const colorScheme = useColorScheme() === 'light' ? 1 : 0;
   return (
     <>
-      <View
-        style={[
-          styles.container,
-          {backgroundColor: colorScheme ? colors.lightWhite : colors.gray},
-        ]}>
+      <View style={styles.container}>
         <Header />
       </View>
       <Tab.Navigator
@@ -30,7 +25,7 @@ export default function HistroyTabs() {
             textTransform: 'none',
           },
           tabBarStyle: {
-            backgroundColor: colorScheme ? colors.white : colors.darkGray,
+            backgroundColor: colors.darkGray,
           },
           tabBarIndicatorStyle: {backgroundColor: colors.yellow, height: 2},
         }}>
@@ -38,7 +33,7 @@ export default function HistroyTabs() {
           name="scannedHistory"
           options={{
             title: 'Scanned',
-            tabBarActiveTintColor: colorScheme ? colors.black : colors.white,
+            tabBarActiveTintColor: colors.white,
             tabBarInactiveTintColor: colors.lightGray,
           }}
           component={ScannedHistoryScreen}
@@ -47,7 +42,7 @@ export default function HistroyTabs() {
           name="generatedHistory"
           options={{
             title: 'Generated',
-            tabBarActiveTintColor: colorScheme ? colors.black : colors.white,
+            tabBarActiveTintColor: colors.white,
             tabBarInactiveTintColor: colors.lightGray,
           }}
           component={GeneratedHistoryScreen}
@@ -57,7 +52,7 @@ export default function HistroyTabs() {
           name="favouriteHistory"
           options={{
             title: 'Favourites',
-            tabBarActiveTintColor: colorScheme ? colors.black : colors.white,
+            tabBarActiveTintColor: colors.white,
             tabBarInactiveTintColor: colors.lightGray,
           }}
           component={FavouriteHistoryScreen}
@@ -72,5 +67,6 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'flex-start',
     alignItems: 'center',
+    backgroundColor: colors.gray,
   },
 });

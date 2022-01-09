@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
 import React, {useState, useRef} from 'react';
 import {
   View,
@@ -8,16 +7,13 @@ import {
   TextInput,
   ScrollView,
   Alert,
-  useColorScheme,
 } from 'react-native';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import ScannedResult from '../../components/ScannedResult/ScannedResult';
-import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import {colors} from '../../Helpers/Colors';
 
 export default function GenerateScreen() {
   const refRBSheet = useRef();
-  const colorScheme = useColorScheme() === 'light' ? 1 : 0;
   const [text, setText] = useState('');
   const [modalData, setModalData] = useState({
     data: '',
@@ -49,37 +45,16 @@ export default function GenerateScreen() {
   }
 
   return (
-    <View
-      style={[
-        styles.container,
-        {backgroundColor: colorScheme ? colors.lightWhite : colors.gray},
-      ]}>
-      <View
-        style={[
-          styles.header,
-          {backgroundColor: colorScheme ? colors.white : colors.darkGray},
-        ]}>
-        <Text
-          style={[
-            styles.headerText,
-            {color: colorScheme ? colors.black : colors.white},
-          ]}>
-          Generate
-        </Text>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerText}>Generate</Text>
       </View>
 
-      <ScrollView
-        style={[
-          styles.content,
-          {backgroundColor: colorScheme ? colors.white : colors.gray},
-        ]}>
+      <ScrollView style={styles.content}>
         <TextInput
           placeholder={'Write here'}
           placeholderTextColor={colors.lightGray}
-          style={[
-            styles.textArea,
-            {color: colorScheme ? colors.black : colors.white},
-          ]}
+          style={styles.textArea}
           multiline={true}
           numberOfLines={7}
           onChangeText={value => handleTextChange(value)}
@@ -87,9 +62,7 @@ export default function GenerateScreen() {
           blurOnSubmit={true}
         />
         <View style={styles.textLimitView}>
-          <Text style={{color: colorScheme ? colors.black : colors.white}}>
-            {text.length}/100
-          </Text>
+          <Text style={{color: colors.white}}>{text.length}/100</Text>
         </View>
         <TouchableOpacity style={styles.button} onPress={() => handleSubmit()}>
           <Text style={styles.buttonText}>Generate</Text>
@@ -110,7 +83,7 @@ export default function GenerateScreen() {
             backgroundColor: colors.lightGray,
           },
           container: {
-            backgroundColor: colorScheme ? colors.white : colors.darkGray,
+            backgroundColor: colors.darkGray,
             borderTopLeftRadius: 30,
             borderTopRightRadius: 30,
             alignSelf: 'center',
@@ -128,6 +101,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     flex: 1,
+    backgroundColor: colors.gray,
   },
   header: {
     width: '100%',
@@ -136,16 +110,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 10,
+    backgroundColor: colors.darkGray,
   },
   headerText: {
     fontSize: 20,
+    color: colors.white,
   },
   content: {
-    backgroundColor: colors.white,
     width: '100%',
     display: 'flex',
     padding: 20,
     flex: 1,
+    backgroundColor: colors.gray,
   },
   textArea: {
     width: '100%',
@@ -154,7 +130,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
     borderRadius: 5,
-    color: colors.black,
+    color: colors.white,
   },
   textLimitView: {
     width: '99%',

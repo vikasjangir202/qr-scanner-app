@@ -1,16 +1,14 @@
 import React from 'react';
-import {View, Text, Image, StyleSheet, useColorScheme} from 'react-native';
+import {View, Text, Image, StyleSheet} from 'react-native';
 import {colors} from '../../Helpers/Colors';
 
 export default function NoResultsScreen() {
-  const colorScheme = useColorScheme() === 'light' ? 1 : 0;
-
   return (
     <View
       style={[
         styles.container,
         {
-          backgroundColor: colorScheme ? colors.white : colors.gray,
+          backgroundColor: colors.gray,
         },
       ]}>
       <Image
@@ -18,11 +16,7 @@ export default function NoResultsScreen() {
         style={styles.img}
         resizeMode="contain"
       />
-      <Text
-        style={[
-          styles.label,
-          {color: colorScheme ? colors.black : colors.lightGray},
-        ]}>
+      <Text style={[styles.label, {color: colors.lightGray}]}>
         Sorry, we couldn't find any results
       </Text>
     </View>
