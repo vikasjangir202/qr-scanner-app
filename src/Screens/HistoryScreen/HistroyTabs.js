@@ -13,7 +13,7 @@ export default function HistroyTabs() {
   return (
     <>
       <View style={styles.container}>
-        <Header />
+        <Header title={'History'} />
       </View>
       <Tab.Navigator
         initialRouteName="scannedHistory"

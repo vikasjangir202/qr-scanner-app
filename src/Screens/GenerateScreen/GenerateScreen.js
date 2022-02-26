@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import ScannedResult from '../../components/ScannedResult/ScannedResult';
+import Header from '../../components/Header/Header';
 import {colors} from '../../Helpers/Colors';
 
 export default function GenerateScreen() {
@@ -46,9 +47,7 @@ export default function GenerateScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>Generate</Text>
-      </View>
+      <Header title={'Generate'} />
 
       <ScrollView style={styles.content}>
         <TextInput
@@ -102,19 +101,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
     backgroundColor: colors.gray,
-  },
-  header: {
-    width: '100%',
-    padding: 15,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 10,
-    backgroundColor: colors.darkGray,
-  },
-  headerText: {
-    fontSize: 20,
-    color: colors.white,
   },
   content: {
     width: '100%',
