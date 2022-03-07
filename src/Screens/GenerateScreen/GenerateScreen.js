@@ -1,34 +1,20 @@
 import React, {useState, useRef} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
-  ScrollView,
-  Alert,
-} from 'react-native';
+import {View, Text, StyleSheet, ScrollView, Alert} from 'react-native';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import ScannedResult from '../../components/ScannedResult/ScannedResult';
 import Header from '../../components/Header/Header';
 import {colors} from '../../Helpers/Colors';
+import GeneratableButtons from '../../components/GeneratableButtons/GeneratableButtons';
+import {personal, tools} from '../../Helpers/generatables';
 
 export default function GenerateScreen() {
   const refRBSheet = useRef();
-  const [text, setText] = useState('');
+  const [text, setText] = useState('test');
   const [modalData, setModalData] = useState({
     data: '',
     flag: 'generated',
     from: 'generated',
   });
-
-  function handleTextChange(inputValue) {
-    if (inputValue.length <= 100) {
-      setText(inputValue);
-    } else {
-      Alert.alert('Alert', 'Maximum limit reached');
-    }
-  }
 
   function handleSubmit() {
     if (text.length) {
@@ -50,22 +36,33 @@ export default function GenerateScreen() {
       <Header title={'Generate'} />
 
       <ScrollView style={styles.content}>
-        <TextInput
-          placeholder={'Write here'}
-          placeholderTextColor={colors.lightGray}
-          style={styles.textArea}
-          multiline={true}
-          numberOfLines={7}
-          onChangeText={value => handleTextChange(value)}
-          value={text}
-          blurOnSubmit={true}
-        />
-        <View style={styles.textLimitView}>
-          <Text style={{color: colors.white}}>{text.length}/100</Text>
+        <View style={styles.labelContainer}>
+          <Text style={styles.label}>Personal</Text>
         </View>
-        <TouchableOpacity style={styles.button} onPress={() => handleSubmit()}>
-          <Text style={styles.buttonText}>Generate</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonContainer}>
+          {personal &&
+            personal.map(item => (
+              <GeneratableButtons
+                action={item.action}
+                label={item.label}
+                iconName={item.iconName}
+              />
+            ))}
+        </View>
+
+        <View style={[styles.labelContainer, {width: '60%', marginTop: 20}]}>
+          <Text style={styles.label}>Tools</Text>
+        </View>
+        <View style={styles.buttonContainer}>
+          {tools &&
+            tools.map(item => (
+              <GeneratableButtons
+                action={item.action}
+                label={item.label}
+                iconName={item.iconName}
+              />
+            ))}
+        </View>
       </ScrollView>
 
       <RBSheet
@@ -96,7 +93,6 @@ export default function GenerateScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    display: 'flex',
     justifyContent: 'flex-start',
     alignItems: 'center',
     flex: 1,
@@ -104,41 +100,24 @@ const styles = StyleSheet.create({
   },
   content: {
     width: '100%',
-    display: 'flex',
     padding: 20,
     flex: 1,
     backgroundColor: colors.gray,
   },
-  textArea: {
-    width: '100%',
-    padding: 10,
-    fontSize: 18,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 5,
+  labelContainer: {
+    width: '80%',
+    display: 'flex',
+    marginBottom: 20,
+  },
+  label: {
     color: colors.white,
+    borderBottomColor: colors.yellow,
+    borderBottomWidth: 1,
+    paddingBottom: 5,
   },
-  textLimitView: {
-    width: '99%',
+  buttonContainer: {
     display: 'flex',
-    justifyContent: 'flex-end',
-    alignItems: 'flex-end',
-    marginVertical: 8,
-  },
-  button: {
-    width: '100%',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: colors.yellow,
-    borderWidth: 1,
-    borderColor: colors.darkGray,
-    borderRadius: 5,
-    paddingVertical: 7,
-    marginVertical: 12,
-  },
-  buttonText: {
-    fontSize: 17,
-    color: colors.darkGray,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
   },
 });
