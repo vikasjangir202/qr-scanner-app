@@ -6,6 +6,9 @@ import GenerateContact from './ItemScreens/GenerateContact';
 import GeneratePhone from './ItemScreens/GeneratePhone';
 import GenerateSMS from './ItemScreens/GenerateSMS';
 import GenerateEmail from './ItemScreens/GenerateEmail';
+import GenerateText from './ItemScreens/GenerateText';
+import GenerateUrl from './ItemScreens/GenerateUrl';
+import GenerateWifi from './ItemScreens/GenerateWifi';
 
 const Stack = createNativeStackNavigator();
 
@@ -22,6 +25,9 @@ export default function GenerateScreen({navigation}) {
       <Stack.Screen name="phone" component={GeneratePhone} />
       <Stack.Screen name="message" component={GenerateSMS} />
       <Stack.Screen name="email" component={GenerateEmail} />
+      <Stack.Screen name="text" component={GenerateText} />
+      <Stack.Screen name="url" component={GenerateUrl} />
+      <Stack.Screen name="wifi" component={GenerateWifi} />
     </Stack.Navigator>
   );
 }

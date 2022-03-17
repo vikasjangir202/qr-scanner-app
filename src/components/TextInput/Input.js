@@ -5,12 +5,21 @@ export default function Input({label, stat, setValue}) {
   return (
     <View style={styles.inputContainer}>
       <Text style={styles.label}>{label}</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={e => setValue(label, e)}
-        //   outlineColor={'red'}
-        value={stat}
-      />
+      {label && label === 'Text' ? (
+        <TextInput
+          style={[styles.input, {textAlignVertical: 'top', paddingTop: 10}]}
+          multiline={true}
+          numberOfLines={7}
+          onChangeText={e => setValue(label, e)}
+          value={stat}
+        />
+      ) : (
+        <TextInput
+          style={styles.input}
+          onChangeText={e => setValue(label, e)}
+          value={stat}
+        />
+      )}
     </View>
   );
 }
@@ -41,5 +50,6 @@ const styles = StyleSheet.create({
     padding: 5,
     color: colors.white,
     borderRadius: 3,
+    paddingLeft: 10,
   },
 });

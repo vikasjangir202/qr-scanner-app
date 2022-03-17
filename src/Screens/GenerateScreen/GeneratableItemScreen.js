@@ -63,6 +63,7 @@ export default function GeneratableItemScreen({navigation}) {
                 action={item.action}
                 label={item.label}
                 iconName={item.iconName}
+                navigation={navigation}
               />
             ))}
         </View>
