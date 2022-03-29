@@ -3,11 +3,18 @@ import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {colors} from '../../Helpers/Colors';
 
-export default function GeneratableButtons({label, action, iconName}) {
+export default function GeneratableButtons({
+  label,
+  action,
+  iconName,
+  navigation,
+}) {
   return (
     <View style={styles.itemContainer}>
       <View style={styles.buttonAndLabel}>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate(action)}>
           <MaterialCommunityIcons
             name={iconName}
             size={22}
