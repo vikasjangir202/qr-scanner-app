@@ -13,11 +13,15 @@ import Input from '../../../components/TextInput/Input';
 import EmptySpace from '../../../components/EmptySpace/EmptySpace';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import ScannedResult from '../../../components/ScannedResult/ScannedResult';
-
+import {RadioButton} from 'react-native-paper';
+import {Switch} from 'react-native-paper';
+import {Button} from 'react-native-paper';
 export default function GenerateWifi() {
   const refRBSheet = useRef();
   const [netWorkName, setNetWorkName] = useState('SKYNET');
   const [password, setPassword] = useState('0987654321');
+  const [enc, setEnc] = useState('WPA');
+  const [hidden, setHidden] = useState(false);
   const [modalData, setModalData] = useState({
     data: '',
     flag: 'generated',
@@ -25,7 +29,7 @@ export default function GenerateWifi() {
   });
 
   function handleSubmit() {
-    let wifiQr = `WIFI:T:WPA;S:${netWorkName};P:${password};H:false;`;
+    let wifiQr = `WIFI:T:${enc};S:${netWorkName};P:${password};H:${hidden};`;
     if (wifiQr) {
       setModalData({
         data: wifiQr,
@@ -60,14 +64,58 @@ export default function GenerateWifi() {
             label={'Network Name'}
           />
           <Input setValue={setValue} stat={password} label={'Password'} />
-          <View>
-            <Text>Encryption</Text>
+          <View style={styles.radioContainer}>
+            <Text style={styles.radioLabel}>Encryption : </Text>
+            <RadioButton
+              value="NONE"
+              status={enc === 'NONE' ? 'checked' : 'unchecked'}
+              uncheckedColor={colors.lightGray}
+              color={colors.yellow}
+              onPress={() => {
+                setEnc('NONE');
+              }}
+            />
+            <Text style={styles.radioLabelSmall}>None</Text>
+            <RadioButton
+              value="WPA"
+              status={enc === 'WPA' ? 'checked' : 'unchecked'}
+              uncheckedColor={colors.lightGray}
+              color={colors.yellow}
+              onPress={() => {
+                setEnc('WPA');
+              }}
+            />
+            <Text style={styles.radioLabelSmall}>WPA / WPA2</Text>
+            <RadioButton
+              value="WEP"
+              status={enc === 'WEP' ? 'checked' : 'unchecked'}
+              uncheckedColor={colors.lightGray}
+              color={colors.yellow}
+              onPress={() => {
+                setEnc('WEP');
+              }}
+            />
+            <Text style={styles.radioLabelSmall}>WEP</Text>
           </View>
-          <TouchableOpacity
-            style={styles.button}
+          <View style={styles.radioContainer}>
+            <Text style={styles.radioLabel}>Hidden : </Text>
+            <Switch
+              value={hidden}
+              color={colors.yellow}
+              onValueChange={() => {
+                setHidden(!hidden);
+              }}
+            />
+          </View>
+
+          <Button
+            mode="contained"
+            style={{alignSelf: 'flex-end', marginRight: 20}}
+            uppercase={false}
+            color={colors.yellow}
             onPress={() => handleSubmit()}>
-            <Ionicons name="create-outline" size={25} color={colors.darkGray} />
-          </TouchableOpacity>
+            Generate
+          </Button>
         </View>
         <EmptySpace />
       </ScrollView>
@@ -111,17 +159,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 5,
   },
-  button: {
+  radioContainer: {
     width: '90%',
     display: 'flex',
-    justifyContent: 'center',
     flexDirection: 'row',
+    justifyContent: 'flex-start',
     alignItems: 'center',
-    padding: 10,
-    backgroundColor: colors.yellow,
-    borderWidth: 1,
-    borderColor: colors.darkGray,
-    borderRadius: 5,
-    margin: 10,
+    marginVertical: 5,
+  },
+  radioLabel: {
+    fontSize: 15,
+    color: colors.lightWhite,
+  },
+  radioLabelSmall: {
+    fontSize: 10,
+    color: colors.lightWhite,
   },
 });
