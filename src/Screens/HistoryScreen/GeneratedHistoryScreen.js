@@ -16,6 +16,7 @@ import NoResultsScreen from '../../components/NoResultsScreen/NoResultsScreen';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import {handleFavourite, handleSingleDelete} from '../../Helpers/functions';
 import EmptySpace from '../../components/EmptySpace/EmptySpace';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 var database_name = 'qrdata'; // Add your Database name
 var database_version = '1.0'; // Add your Database Version
@@ -139,12 +140,19 @@ export default function GeneratedHistoryScreen() {
                             backgroundColor: colors.listItem,
                           },
                         ]}>
-                        <View>
+                        <View style={{display: 'flex', flexDirection: 'row'}}>
+                          <MaterialCommunityIcons
+                            name={'phone'}
+                            size={22}
+                            color={colors.yellow}
+                            style={{marginRight: 10}}
+                          />
                           <Text
                             style={[
                               styles.label,
                               {
                                 color: colors.white,
+                                width: '80%',
                               },
                             ]}
                             numberOfLines={1}>
